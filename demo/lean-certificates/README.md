@@ -90,7 +90,7 @@ does not prove that the hypotheses are satisfiable.
 Local run, details in [`VALIDATION.txt`](VALIDATION.txt): clean `lake build` 92 s with
 0 warnings (about 38 s per data file, so about 10 s per certificate; peak about 7.4 GB RSS per
 Lean process, of which about 5.1 GB is memory-mapped Mathlib); `check_lean.py` 63 s;
-29 Python tests in under 1 s. The GitHub workflow runs the same steps; it has not run yet.
+29 Python tests in under 1 s. The GitHub workflow runs the same steps; its first run (25 Oct 2026) passed.
 
 ## Run it
 
@@ -134,8 +134,8 @@ WEIL_RERUN=/path/to/weil-mechanism/rerun /path/to/venv/bin/python export_window.
 This pilot covers 2 of the 27 certified windows (the certified range currently reaches
 `L = 1.09`; the run is extending toward `1.19`), and only the matrix step. Planned future work:
 
-- **All windows.** Near `L = 1` the head matrices have `N` up to about 4,500 per sector,
-  dense factors, and margins of about `10⁻³⁰`, so the residual needs integers of 100+ bits and
+- **All windows.** At `L = 1.09` the head matrices have `N ≈ 3,000` per sector (about 4,600 at `1.19`),
+  dense factors, and `λ₀ ≈ 10⁻³⁷`, so the residual needs integers of 130+ bits and
   about `N³/6` multiply-adds per certificate. That needs new performance work beyond kernel
   `decide` (efficient verified arithmetic, structured or blocked certificates).
 - **The analytic lemmas.** Formalizing (R), (S), (D), (E) and the tail bounds, so that the

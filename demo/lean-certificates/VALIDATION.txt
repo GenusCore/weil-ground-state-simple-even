@@ -36,8 +36,8 @@ Measured along the way: the same 97x97 certificate written as Int list literals
 took 9 min 37 s and 9.2 GB peak RSS for one matrix. With packed hexadecimal literals
 and the structural checker it takes about 10 s.
 
-NOT RUN: the GitHub workflow (pinned actions, concurrency group). Its first run
-will produce validation-local.json in CI.
+GitHub workflow (pinned actions, concurrency group): first run 25 Oct 2026 passed
+(build, axiom audit, tampered-certificate rejections).
 
 SCOPE: Lean checks the head-matrix step (the linear algebra) at the dyadic windows
 L~ >= 0.05 and 0.1, and that the resulting bounds imply the stored lower ends at those
