@@ -1,0 +1,34 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below. It is unrefereed and was produced largely with AI assistance (see README.md)."
+title: "A certified simple, even ground state of the localized Weil quadratic form for all windows L in (0, 1.09]"
+type: software
+authors:
+  - given-names: "Johann Alexander"
+    family-names: "Botha"
+    email: "info@genuscore.com"
+version: "2026-10-25"
+date-released: "2026-10-25"
+license: MIT
+keywords:
+  - Weil explicit formula
+  - Riemann zeta function
+  - computer-assisted proof
+  - interval arithmetic
+  - Arb
+references:
+  - type: generic
+    title: "Weil positivity in compact windows: a finite reduction, certified two-sided bounds, and a Landau-Widom decay law"
+    authors:
+      - family-names: Zhu
+    identifiers:
+      - type: other
+        value: "arXiv:2608.24827"
+    notes: "The reduction strategy used by every window certificate; certified simple-even at L = 0.8."
+  - type: article
+    title: "Arb: efficient arbitrary-precision midpoint-radius interval arithmetic"
+    authors:
+      - family-names: Johansson
+        given-names: Fredrik
+    journal: "IEEE Transactions on Computers"
+    volume: 66
+    year: 2017
