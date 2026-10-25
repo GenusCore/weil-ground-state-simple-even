@@ -1,0 +1,46 @@
+LOCAL VALIDATION, 25 OCTOBER 2026
+
+Machine: Intel Core i9-12900H (20 threads), Linux 7.0. Toolchain: elan 4.2.4,
+Lean 4.19.0 (commit 6caaee842e94), Lake 5.0.0-6caaee8, Mathlib v4.19.0
+(c44e0c8ee63ca166450922a373c7409c5d26b00b, pinned in lake-manifest.json), Python 3.14.4.
+Producer only: python-flint 0.9.0 (Python 3.12.13), Weil code at weil-mechanism/rerun.
+
+PASS  export_window.py rerun     from the Arb cache, before the pilot was scoped:    7.7 s
+                                 Data/W005.lean and Data/W01.lean reproduced byte
+                                 for byte. certificates.json was then trimmed to
+                                 the two windows (dyadic points for 0.05 and 0.1
+                                 only); the trimmed exporter has not been rerun.
+PASS  python3 checker.py         exact preflight of the six certificates           0.14 s
+PASS  python3 -m unittest        29 tests (exporter smoke test skipped without       0.9 s
+                                 python-flint)
+PASS  lake build (clean, own package only; Mathlib from cache), 0 warnings         92 s
+        modules built one after the other (wall time per module, includes about
+        3 s to load Mathlib):
+          Checker 5.2 s, Window 4.0 s, Data/W005 37.6 s, Data/W01 38.8 s,
+          Rows 3.3 s (three kernel `decide +kernel` checks of 97x97 certificates
+          per data file, so about 10 s per certificate)
+        peak RSS per Lean process 7.3-7.4 GB. Of this, about 5.1 GB is the
+        memory-mapped Mathlib (the baseline for `import Mathlib`, shared between
+        processes), so each data file adds about 2.3 GB. On a machine with little RAM,
+        build the two data files one after the other.
+PASS  python3 check_lean.py      63.3 s wall
+        forbidden-keyword scan (sorry, admit, native_decide, implemented_by, extern,
+        unsafe, axiom, ofReduceBool): none
+        axiom audit, 11 theorems: only propext, Classical.choice, Quot.sound
+        boundary acceptance: mu = M - n K exactly is accepted (16.2 s)
+        Lean rejects tampered inputs ("decide proved that the proposition ... is false"):
+          matrix-entry 12.5 s, interval-radius+1 (one unit 2^-64 past the budget) 11.0 s,
+          factor-entry 10.3 s, mu+1 (one unit past M - n K) 7.5 s
+
+Measured along the way: the same 97x97 certificate written as Int list literals
+took 9 min 37 s and 9.2 GB peak RSS for one matrix. With packed hexadecimal literals
+and the structural checker it takes about 10 s.
+
+NOT RUN: the GitHub workflow (pinned actions, concurrency group). Its first run
+will produce validation-local.json in CI.
+
+SCOPE: Lean checks the head-matrix step (the linear algebra) at the dyadic windows
+L~ >= 0.05 and 0.1, and that the resulting bounds imply the stored lower ends at those
+two windows. All analytic inputs are hypotheses (see README.md, "What is trusted").
+Nothing about the other windows or about how windows combine into a statement over a
+range of L is checked in Lean. There has been no independent expert review.

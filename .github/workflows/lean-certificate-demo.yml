@@ -1,0 +1,52 @@
+name: Lean certificate demo
+
+on:
+  push:
+    paths:
+      - 'demo/lean-certificates/**'
+      - 'data/theorem_bounds.json'
+      - '.github/workflows/lean-certificate-demo.yml'
+  pull_request:
+    paths:
+      - 'demo/lean-certificates/**'
+      - 'data/theorem_bounds.json'
+      - '.github/workflows/lean-certificate-demo.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lean-certificate-demo-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  certificate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - name: Exact Python preflight and adversarial tests
+        working-directory: demo/lean-certificates
+        run: |
+          python3 checker.py
+          python3 -m unittest -v
+      - name: Install pinned Lean toolchain, fetch Mathlib and build
+        uses: leanprover/lean-action@24581d74d674803a25a81b10b059c5c0cdd344c6 # v1.6.2
+        with:
+          lake-package-directory: demo/lean-certificates
+          build: 'true'
+          test: 'false'
+          lint: 'false'
+          use-mathlib-cache: 'true'
+      - name: Axiom audit and Lean rejection of tampered certificates
+        working-directory: demo/lean-certificates
+        run: python3 check_lean.py
+      - name: Preserve Lean verification evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: lean-certificate-verification
+          if-no-files-found: error
+          path: |
+            demo/lean-certificates/validation-local.json
+            demo/lean-certificates/lake-manifest.json
