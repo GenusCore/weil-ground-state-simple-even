@@ -1,13 +1,13 @@
 cff-version: 1.2.0
 message: "If you use this work, please cite it as below. It is unrefereed and was produced largely with AI assistance (see README.md)."
-title: "A certified simple, even ground state of the localized Weil quadratic form for all windows L in (0, 1.09]"
+title: "A certified simple, even ground state of the localized Weil quadratic form for all windows L in (0, 1.19]"
 type: software
 authors:
   - given-names: "Johann Alexander"
     family-names: "Botha"
     email: "info@genuscore.com"
-version: "2026-10-25"
-date-released: "2026-10-25"
+version: "2026-10-26"
+date-released: "2026-10-26"
 license: MIT
 keywords:
   - Weil explicit formula

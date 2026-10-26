@@ -14,10 +14,10 @@ DIGITS = int(os.environ.get("CERT_DIGITS", 60))
 
 
 def work(args):
-    flat = certify._partial(args)
     path = f"{TMP}_{uuid.uuid4().hex}"
     with open(path, "w") as f:
-        f.write("\n".join(flat))
+        for line in certify._partial_lines(args):
+            f.write(line + "\n")
     return path
 
 
@@ -38,15 +38,16 @@ if __name__ == "__main__":
     panels = list(range(a, b, c))
     # half the cores: the coordinator runs the even and odd sectors concurrently on every host.
     # ProcessPoolExecutor (unlike multiprocessing.Pool) raises BrokenProcessPool if a worker dies, e.g. OOM.
-    # Memory cap: a worker keeps ~240 N^2 bytes (its O(N^2) arb sums, measured 1.75 GB at N = 2962, plus its
-    # /dev/shm file) until the pool closes; half of 80% of MemAvailable per sector. CERT_NODE_PROCS overrides.
+    # Memory cap: a worker needs ~100 N^2 bytes (its upper-triangle arb sums, measured 0.87 GB at N = 4305, plus
+    # its ~0.75 GB /dev/shm file); half of 80% of MemAvailable per sector. CERT_NODE_PROCS overrides.
     N = certify.Window(L, parity).N
     avail = int(next(l.split()[1] for l in open("/proc/meminfo") if l.startswith("MemAvailable"))) * 1024
-    cap = int(os.environ.get("CERT_NODE_PROCS", 0)) or max(1, int(0.4 * avail / (240 * N * N)))
+    cap = int(os.environ.get("CERT_NODE_PROCS", 0)) or max(1, int(0.4 * avail / (100 * N * N)))
     procs = min(max(1, os.cpu_count() // 2), len(panels), cap)
     print(f"node_partial: N={N} procs={procs}", file=sys.stderr)
     with ProcessPoolExecutor(procs) as pool:
         files = list(pool.map(work, [(L, parity, panels[p::procs]) for p in range(procs)]))
+    with ProcessPoolExecutor(procs) as pool:  # fresh processes: the workers' memory is returned before merging
         while len(files) > 1:
             pairs = [(files[i], files[i + 1]) for i in range(0, len(files) - 1, 2)]
             files = list(pool.map(merge, pairs)) + (files[-1:] if len(files) % 2 else [])

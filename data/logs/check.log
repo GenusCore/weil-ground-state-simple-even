@@ -25,6 +25,10 @@ L=1.0    [4.532e-30 +/- 4.92e-34] <= lam0 <= [6.600e-30 +/- 6.37e-35]   lam1even
 L=1.03   [2.096e-32 +/- 2.30e-36] <= lam0 <= [4.109e-32 +/- 2.31e-36]   lam1even >= [1.056e-25 +/- 1.21e-29]   lam0odd >= [6.604e-29 +/- 2.78e-33]   (0s)
 L=1.06   [7.276e-35 +/- 1.18e-39] <= lam0 <= [1.248e-34 +/- 2.42e-38]   lam1even >= [4.435e-28 +/- 1.55e-33]   lam0odd >= [2.691e-31 +/- 6.22e-36]   (0s)
 L=1.09   [1.307e-37 +/- 2.93e-41] <= lam0 <= [2.161e-37 +/- 4.08e-41]   lam1even >= [1.035e-30 +/- 9.57e-35]   lam0odd >= [4.712e-34 +/- 1.61e-38]   (0s)
+L=1.12   [1.904e-40 +/- 2.01e-44] <= lam0 <= [3.000e-40 +/- 4.09e-44]   lam1even >= [2.050e-33 +/- 2.61e-37]   lam0odd >= [8.502e-37 +/- 4.58e-42]   (0s)
+L=1.15   [1.752e-43 +/- 2.78e-47] <= lam0 <= [2.798e-43 +/- 1.88e-47]   lam1even >= [2.501e-36 +/- 3.40e-41]   lam0odd >= [8.573e-40 +/- 3.60e-44]   (0s)
+L=1.18   [9.793e-47 +/- 2.52e-52] <= lam0 <= [1.635e-46 +/- 1.63e-50]   lam1even >= [2.089e-39 +/- 4.80e-43]   lam0odd >= [6.011e-43 +/- 4.72e-47]   (0s)
+L=1.19   [7.823e-48 +/- 1.52e-52] <= lam0 <= [1.312e-47 +/- 4.30e-51]   lam1even >= [1.439e-40 +/- 2.16e-44]   lam0odd >= [4.330e-44 +/- 1.90e-48]   (0s)
 Piece I  (0, 0.05]:  gap_even >= [0.4173 +/- 2.49e-5]   gap_odd >= [0.6624 +/- 2.49e-5]   True
 Piece II [0.05, 0.1]:  min(lam1even, lam0odd)(0.1) / lam0_up(0.05) >= [1.289 +/- 1.81e-4]   True
 Piece II [0.1, 0.2]:  min(lam1even, lam0odd)(0.2) / lam0_up(0.1) >= [1.321 +/- 4.28e-4]   True
@@ -52,4 +56,8 @@ Piece II [0.99, 1.0]:  min(lam1even, lam0odd)(1.0) / lam0_up(0.99) >= [321.6 +/-
 Piece II [1.0, 1.03]:  min(lam1even, lam0odd)(1.03) / lam0_up(1.0) >= [10.01 +/- 3.62e-3]   True
 Piece II [1.03, 1.06]:  min(lam1even, lam0odd)(1.06) / lam0_up(1.03) >= [6.549 +/- 1.77e-4]   True
 Piece II [1.06, 1.09]:  min(lam1even, lam0odd)(1.09) / lam0_up(1.06) >= [3.775 +/- 2.19e-4]   True
-THEOREM CERTIFIED for all L in (0, 1.09]
+Piece II [1.09, 1.12]:  min(lam1even, lam0odd)(1.12) / lam0_up(1.09) >= [3.934 +/- 4.31e-4]   True
+Piece II [1.12, 1.15]:  min(lam1even, lam0odd)(1.15) / lam0_up(1.12) >= [2.857 +/- 1.58e-4]   True
+Piece II [1.15, 1.18]:  min(lam1even, lam0odd)(1.18) / lam0_up(1.15) >= [2.148 +/- 3.46e-4]   True
+Piece II [1.18, 1.19]:  min(lam1even, lam0odd)(1.19) / lam0_up(1.18) >= [264.8 +/- 6.05e-3]   True
+THEOREM CERTIFIED for all L in (0, 1.19]

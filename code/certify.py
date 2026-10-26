@@ -135,7 +135,7 @@ def dfact(n):  # (2n+1)!!
     return r
 
 
-def _partial(args):  # C restricted to the given unit panels [k, k+1]: sum_nodes w (Psi - beta)/pi F F^T
+def _partial_lines(args):  # C restricted to the given unit panels [k, k+1]: sum_nodes w (Psi - beta)/pi F F^T
     """Returns the upper triangle (row-major, j >= i) of the panel contribution as ball strings.
     CERT_BESSEL_PREC=b: nodes and Bessel values at b bits via bessel_rec.sph_bessel_hybrid (all orders per node).
     CERT_MATMUL_PREC=m: the N x N product is formed at m bits (rounding goes into the radii)."""
@@ -178,17 +178,29 @@ def _partial(args):  # C restricted to the given unit panels [k, k+1]: sum_nodes
             vals[cut:] = [arb(0)] * (W.N - cut)
         return sw, vals
 
-    C = None
-    for k in panels:  # one panel at a time into a running sum: memory stays O(N^2), not O(N * columns)
+    # One panel at a time into a running sum of the upper triangle only, kept as row blocks: block b holds rows
+    # [bR, bR + R) x columns [bR, N). ~N^2/2 entries per worker instead of three full N x N matrices (C, P, C + P),
+    # and half the multiplications. Each entry is the same sum over nodes as the full product G Phi^T.
+    R, N = 256, W.N
+    C = [None] * ((N + R - 1) // R)
+    for k in panels:
         cols = [column(k, x, w) for x, w in gauss]
         with ctx.workprec(mprec):
-            Phi = arb_mat([[v[m] for _, v in cols] for m in range(W.N)])
-            G = arb_mat([[s * v[m] for s, v in cols] for m in range(W.N)])
-            P = G * Phi.transpose()
-            C = P if C is None else C + P
+            for b in range(len(C)):
+                r0, r1 = b * R, min(b * R + R, N)
+                P = arb_mat([[s * v[m] for s, v in cols] for m in range(r0, r1)]) * \
+                    arb_mat([[v[m] for m in range(r0, N)] for _, v in cols])
+                C[b] = P if C[b] is None else C[b] + P
     digits = int(os.environ.get("CERT_DIGITS", 240))  # transport precision; rounding is absorbed into the radius
     e = arb(0, drop[0])
-    return [(C[i, j] + e).str(digits, radius=True) for i in range(W.N) for j in range(i, W.N)]
+    for i in range(N):  # generator: the cluster worker streams these lines to a file
+        b, r0 = i // R, i // R * R
+        for j in range(i, N):
+            yield (C[b][i - r0, j - r0] + e).str(digits, radius=True)
+
+
+def _partial(args):
+    return list(_partial_lines(args))
 
 
 def _untri(flat, N):  # upper-triangle strings -> full symmetric matrix of arbs

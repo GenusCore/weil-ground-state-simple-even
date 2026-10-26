@@ -1,8 +1,8 @@
-# A certified simple, even ground state of the localized Weil quadratic form for all windows $L \in (0, 1.09]$
+# A certified simple, even ground state of the localized Weil quadratic form for all windows $L \in (0, 1.19]$
 
 **Johann Alexander Botha** (GenusCore; contact: info@genuscore.com)
 
-*Computer-assisted note. Not refereed. Release version of 2026-10-25 (internal reviews of 2026-10-23/24, extension past $L = 1$ of 2026-10-24/25). The sharp-cutoff path (§4.6) and the windows 1.03–1.09 have not been through any review round, internal or external.*
+*Computer-assisted note. Not refereed. Release version of 2026-10-26 (internal reviews of 2026-10-23/24, extension past $L = 1$ of 2026-10-24/25, extension to $L = 1.19$ of 2026-10-25/26). The sharp-cutoff path (§4.6), the windows 1.03–1.19 and the triangular assembly code used for 1.12–1.19 have not been through any review round, internal or external.*
 *Code, data and logs: this repository (`code/`, `data/`, `data/logs/`). The certificate of record is `data/theorem_bounds.json`; `python code/theorem.py --check` re-runs Piece I and Piece II on it without recomputing any window (§6).*
 *File names.* Sections that describe the history of the certificate name development files that are not part of this release, for example `run_theorem*.log`, `run_step3*.log`, `cache/`, `NOVELTY.md` (our prior-art survey), `REDUCTION.md` and the directories `weil-mechanism/`, `rerun/`, `extend/`. Released counterparts: the `rerun/` and `extend/` code is `code/` (the `extend/` revision); `rerun/run_rerun.log`, `extend/run_extend.log` and `run_gl_correction.log` are in `data/logs/`; the `theorem_bounds.json` of the original runs is `data/history/theorem_bounds_original.json`, and `theorem_bounds_corrected.json` is in `data/history/`; `weil_z.py` and the Appendix A scripts are in `exploratory/`.
 *AI-assistance disclosure: this note, the certification code, the correction script, and every internal review of them (including the reviews in the Review log) were produced largely by an AI assistant (Anthropic's Claude, used through Claude Code), directed by the author, who is not a professional mathematician. No human referee has checked any of it.*
@@ -11,10 +11,10 @@
 
 ## Abstract
 
-We consider Weil's quadratic form $Q$ for the Riemann zeta function, restricted to real test functions supported in a window $[-L, L]$ on the logarithmic scale. The form keeps the pole terms, the archimedean term, and every prime power $n$ with $\log n < 2L$. We prove that for **every** $L \in (0, 1.09]$ the lowest eigenvalue of the associated self-adjoint operator is simple and its eigenfunction is even. The proof is computer-assisted and has two parts.
+We consider Weil's quadratic form $Q$ for the Riemann zeta function, restricted to real test functions supported in a window $[-L, L]$ on the logarithmic scale. The form keeps the pole terms, the archimedean term, and every prime power $n$ with $\log n < 2L$. We prove that for **every** $L \in (0, 1.19]$ the lowest eigenvalue of the associated self-adjoint operator is simple and its eigenfunction is even. The proof is computer-assisted and has two parts.
 
 - **Piece I, $(0, 0.05]$.** A Lipschitz estimate for a rescaled form. It uses explicit derivative bounds and one certified integral, and it is anchored at the certified window $L = 0.05$.
-- **Piece II, $[0.05, 1.09]$.** A covering by 27 grid windows, glued together by min-max monotonicity in $L$.
+- **Piece II, $[0.05, 1.19]$.** A covering by 31 grid windows, glued together by min-max monotonicity in $L$.
 
 At each grid window we certify three things in Arb ball arithmetic:
 
@@ -24,11 +24,11 @@ At each grid window we certify three things in Arb ball arithmetic:
 
 **Small windows.** For $L \le (1/2)\log\rho_{\mathrm{plastic}} \approx 0.1406$ the statement was already available. The unrefereed notes [PL294] give an explicit Beurling–Deny (positivity-improving) argument. The unrefereed [An1] states the same threshold for the full form in a remark; its theorem covers only the pole-removed form. [Su] covers a non-explicit range of small $L$.
 
-**What is new, and what is not.** Zhu certified simple-even at the single window $L = 0.8$ [Zhu, Thm 6.2] (§1.3). Kramarenko-Byrd [KB] (Zenodo deposit of 2026-09-27; unrefereed) claims a rigorous proof of simple-even for **all** $0 < L \le 4/5$, in the same half-width convention. Earlier drafts of this note, written before we found [KB], claimed the interval $[0.1406, 1]$ as new; **that claim is withdrawn.** The part we believe to be new is $(0.8, 1.09]$: our search (§1.3; last refreshed 2026-10-25) found no public proof or certificate of simple-even for any window $L > 0.8$ of the continuum form, other than the non-explicit neighbourhood of $0.8$ in [PL287]. In this range the prime powers $5$, $7$ and $8$ enter (at $L = 0.8047$, $0.9730$, $1.0397$). On $(0, 0.8]$ our certificate is an independent computer-assisted confirmation of the range claimed in [KB] (independent of [KB]; not methodologically independent of [Zhu], whose reduction it uses). Every window certificate rests on Zhu's frequency-cutoff ("one-stroke") reduction, including its head/tail block estimate [Zhu, Thm 1.1].
+**What is new, and what is not.** Zhu certified simple-even at the single window $L = 0.8$ [Zhu, Thm 6.2] (§1.3). Kramarenko-Byrd [KB] (Zenodo deposit of 2026-09-27; unrefereed) claims a rigorous proof of simple-even for **all** $0 < L \le 4/5$, in the same half-width convention. Earlier drafts of this note, written before we found [KB], claimed the interval $[0.1406, 1]$ as new; **that claim is withdrawn.** The part we believe to be new is $(0.8, 1.19]$: our search (§1.3; last refreshed 2026-10-25) found no public proof or certificate of simple-even for any window $L > 0.8$ of the continuum form, other than the non-explicit neighbourhood of $0.8$ in [PL287]. In this range the prime powers $5$, $7$, $8$ and $9$ enter (at $L = 0.8047$, $0.9730$, $1.0397$, $1.0986$). On $(0, 0.8]$ our certificate is an independent computer-assisted confirmation of the range claimed in [KB] (independent of [KB]; not methodologically independent of [Zhu], whose reduction it uses). Every window certificate rests on Zhu's frequency-cutoff ("one-stroke") reduction, including its head/tail block estimate [Zhu, Thm 1.1].
 
 **Reproducibility status.**
 
-- **Certificate of record.** `data/theorem_bounds.json` holds the 27 windows. The 24 windows $L \le 1$ come from a clean end-to-end rerun with a single code revision (2026-10-24): empty cache, empty bounds file, `vchol`/`veig` rebuilt from source, SHA-256 check of the code on every cluster host (log `data/logs/run_rerun.log`). The windows $1.03$, $1.06$, $1.09$ come from the extension run (2026-10-24/25, log `data/logs/run_extend.log`), which uses the sharp-cutoff code path of §4.6. `python code/theorem.py --check` re-runs Piece I and all 26 Piece II steps on this file and ends with "THEOREM CERTIFIED for all L in (0, 1.09]" (`data/logs/check.log`). Table 2 (§5) lists the numbers.
+- **Certificate of record.** `data/theorem_bounds.json` holds the 31 windows. The 24 windows $L \le 1$ come from a clean end-to-end rerun with a single code revision (2026-10-24): empty cache, empty bounds file, `vchol`/`veig` rebuilt from source, SHA-256 check of the code on every cluster host (log `data/logs/run_rerun.log`). The windows $1.03$, $1.06$, $1.09$ come from the extension run (2026-10-24/25), and $1.12$, $1.15$, $1.18$, $1.19$ from its continuation (2026-10-25/26) with the triangular head assembly (Erratum, further issues, item 4); both use the sharp-cutoff code path of §4.6 and share the log `data/logs/run_extend.log`. `python code/theorem.py --check` re-runs Piece I and all 30 Piece II steps on this file and ends with "THEOREM CERTIFIED for all L in (0, 1.19]" (`data/logs/check.log`). Table 2 (§5) lists the numbers.
 - **History.** The windows $L \le 1$ were first certified in several runs by successive revisions of the code, with a Gauss–Legendre error constant that was off by one node. That certificate was corrected by a Weyl-shift argument (see Erratum and correction). Table 1 and many numbers quoted in §§4–6 are from the corrected original certificate (`data/history/theorem_bounds_corrected.json`). The rerun supersedes it and does not depend on it; the two agree in the lower bounds to about three significant digits, except at $L = 1$ (§7.2).
 
 A further caveat: our $Q$ is identified with the Connes–van Suijlekom / CCM form only up to positive affine rescaling (§7.3).
@@ -75,6 +75,7 @@ A further caveat: our $Q$ is identified with the Connes–van Suijlekom / CCM fo
 1. **Process-global precision and threads.** python-flint's working precision `ctx.prec` is global to the process. When `CLUSTER` is set, `window_bounds` assembles the even and odd heads concurrently in two threads. A development version of `psi_floor` (§4.6) used the context manager `ctx.workprec`; its save and restore of the global value, interleaved across the two threads, left the coordinator at the lower precision. The released `psi_floor` does not change the precision, and `_head` asserts that `ctx.prec` is unchanged after it. The remaining `ctx.workprec` uses run in worker processes (`_partial`) or in the main thread after both head threads have joined (`lowest`, `rayleigh_upper`). Ball arithmetic at a lower precision still returns valid, only wider, enclosures, so this was a robustness issue, not a rigor issue.
 2. **Out of memory at $L = 1.06$.** At $N = 2962$ each worker process holds about 1.75 GB of ball sums (measured) plus a shared-memory file. With one worker per two cores and both sectors running at once, the cluster nodes ran out of memory and the run stopped with `BrokenProcessPool` (`data/logs/run_extend.log`). No bounds were written. The fix in `node_partial.py` caps the workers per sector at $0.4 \cdot \mathrm{MemAvailable}/(240 N^2)$ (override: `CERT_NODE_PROCS`) and streams the pairwise merges line by line. The fix changes how panels are split among processes and in which order the ball sums are added, not what is summed. The window $1.03$ was certified before the fix, $1.06$ and $1.09$ after it. The SHA-256 check covers `node_partial.py`, so in each run the hosts used the coordinator's version.
 3. **A decimal constant.** The floor $\beta = 3/16$ of the sharp path is an exact dyadic number. A first version used `arb("0.2")`, whose parsing radius entered every head entry. This affected sharpness only.
+4. **Memory past $L = 1.09$: triangular assembly.** At $N \approx 4300$–$4600$ ($L = 1.12$–$1.19$) the full $N \times N$ ball products of item 2 no longer fit. Before the windows $1.12$–$1.19$ were run (`certify.py` edited 2026-10-25 15:08, run restarted 15:12), `_partial` was changed to accumulate only the **upper triangle** of each head block, in row blocks of 256 rows (block $b$ = rows $[256b, 256b+256)$ × columns $[256b, N)$), and `node_partial.py` now streams these lines to its shared-memory file one at a time. Each entry is the same sum over the same nodes as before; only about $N^2/2$ entries are formed, with half the multiplications. The worker cap now budgets about $100 N^2$ bytes per worker (the upper-triangle sums, measured $0.87$ GB at $N = 4305$, plus the ~$0.75$ GB shared-memory file) instead of $240 N^2$, and the merge stage uses a fresh process pool so that worker memory is returned. **Equivalence check** (one-off, not in the repository): the old and new `_partial` were run on $(L = 0.3$, even, panels 0–2$)$, $(L = 0.8$, odd, panels 5–6$)$ and $(L = 1.0$, even, panel 40, $N = 1745)$; all $4{,}851$, $11{,}476$ and $1{,}523{,}385$ entries came out as byte-identical strings. The windows $L \le 1.09$ in the certificate of record were certified before this change. A new helper `prefetch.py` assembles head matrices into `cache/` ahead of the certifying run; it was used to pipeline the runs (§4.6).
 
 ---
 
@@ -89,15 +90,15 @@ Q(f) = W(f * \tilde f), \qquad
 W(g) = \hat g(\tfrac i2) + \hat g(-\tfrac i2) - g(0)\log\pi + \frac{1}{2\pi}\int_{\mathbb{R}} \hat g(r)\,\mathrm{Re}\,\psi\!\left(\tfrac14 + \tfrac{ir}{2}\right) dr - \sum_{n \ge 2} \frac{\Lambda(n)}{\sqrt n}\,\big[g(\log n) + g(-\log n)\big].
 $$
 
-Weil's criterion says that RH is equivalent to $Q(f) \ge 0$ for all such $f$ and all $L$. Since $g$ is supported in $[-2L, 2L]$, only prime powers with $\log n < 2L$ contribute. For $L \le 1.09$ these are $n = 2, 3, 4, 5, 7, 8$. Each $n$ enters at $L = \tfrac12\log n$:
+Weil's criterion says that RH is equivalent to $Q(f) \ge 0$ for all such $f$ and all $L$. Since $g$ is supported in $[-2L, 2L]$, only prime powers with $\log n < 2L$ contribute. For $L \le 1.19$ these are $n = 2, 3, 4, 5, 7, 8, 9$. Each $n$ enters at $L = \tfrac12\log n$:
 
-| $n$ | 2 | 3 | 4 | 5 | 7 | 8 | 9 |
-|---|---|---|---|---|---|---|---|
-| enters at $L = \tfrac12 \log n$ | 0.3466 | 0.5493 | 0.6931 | 0.8047 | 0.9730 | 1.0397 | 1.0986 (outside range) |
+| $n$ | 2 | 3 | 4 | 5 | 7 | 8 | 9 | 11 |
+|---|---|---|---|---|---|---|---|---|
+| enters at $L = \tfrac12 \log n$ | 0.3466 | 0.5493 | 0.6931 | 0.8047 | 0.9730 | 1.0397 | 1.0986 | 1.1989 (outside range) |
 
 ### 1.2 The simple-even hypothesis
 
-Connes and van Suijlekom [CvS] and Connes–Consani–Moscovici [CCM, §8] consider the operator $A_L$ attached to this form on $L^2(-L, L)$. They show that if its lowest eigenvalue is **simple** with an **even** eigenfunction $\xi_L$, then $\hat\xi_L$ has only real zeros. The simple-even property is assumed there and is listed as a missing step. Even for all $L$, this would not by itself prove RH: the programme also needs the zeros of $\hat\xi_L$ to converge to those of $\zeta$ as $L\to\infty$. This note addresses neither the all-$L$ statement nor the limit; it verifies the hypothesis on $(0, 1.09]$ only.
+Connes and van Suijlekom [CvS] and Connes–Consani–Moscovici [CCM, §8] consider the operator $A_L$ attached to this form on $L^2(-L, L)$. They show that if its lowest eigenvalue is **simple** with an **even** eigenfunction $\xi_L$, then $\hat\xi_L$ has only real zeros. The simple-even property is assumed there and is listed as a missing step. Even for all $L$, this would not by itself prove RH: the programme also needs the zeros of $\hat\xi_L$ to converge to those of $\zeta$ as $L\to\infty$. This note addresses neither the all-$L$ statement nor the limit; it verifies the hypothesis on $(0, 1.19]$ only.
 
 - Elder [El] (Zenodo deposit; unrefereed) also treats it as open ("Step A").
 - Numerically it is consistently observed, for example in [Zhu, Table 1] and in Eberwein [Eb] (Zenodo deposit; unrefereed).
@@ -116,7 +117,7 @@ The prior-art survey is recorded in our internal survey `NOVELTY.md` (not releas
   - **Certified upper bounds.** Zhu certifies unconditional variational upper bounds on $\lambda_0$ at $L = 0.5, 0.6, \dots, 1.2, 1.4, \dots, 2.0$ [Zhu, §1.3, §11.4, Table 3], for example $\lambda_0(0.8) \le 2.27\cdot10^{-17}$ and $\lambda_0(1.0) \le 8.08\cdot10^{-30}$. Combined with Thm 1.2 this gives a certified two-sided enclosure $8.9\cdot10^{-18} \le \lambda_0(0.8) \le 2.27\cdot10^{-17}$ [Zhu, §1.4, §8].
   - **The reduction.** Zhu's frequency-cutoff ("one-stroke") reduction with its head/tail block estimate [Zhu, Thm 1.1, proved in §4] is the basis of our Lemmas (R) and (S). The envelope bound behind it is [Zhu, Lemma 3.1], our Lemma (E).
   - Zhu's Table 1 is numerical.
-  - Zhu §7 retracts an earlier certified-positivity claim at $L = 1.19$.
+  - Zhu §7 retracts an earlier certified-positivity claim at $L = 1.19$, which is our last window (see §7, item 8).
 - **Positivity certificates.** Positivity, or lower bounds on $\lambda_0$, on parts of $(0, 0.973]$ have been certified or claimed by the sources below. None of them certifies simplicity, the parity of the ground state, or an upper bound on $\lambda_0$.
   - jose-paul-b [JPB] [GitHub repository; "AI-audited" per `NOVELTY.md`; unrefereed]: all $L \le (\log 7)/2$.
   - Eureka [Eu, §5.3] [arXiv preprint]: a self-described interval-Cholesky positivity "candidate" on $(0, 0.345]$, not replayed by us.
@@ -131,7 +132,7 @@ The prior-art survey is recorded in our internal survey `NOVELTY.md` (not releas
 
 ### 1.4 What is new
 
-> For $L \le 0.1406$ the ground state is simple and even by the Beurling–Deny argument (explicit threshold in the unrefereed [PL294], cf. the remark in the unrefereed [An1], which builds on [Su §5]; a non-explicit small-$L$ range in [Su, Thm 1.4]; an analytic argument up to $L \le 0.18$ is reported in [MS]). Zhu certified simple-even at the single window $L = 0.8$ [Zhu, Thm 6.2], and Kramarenko-Byrd claims it for every $L \le 0.8$ [KB]. **We give a rigorous, computer-assisted (Arb) proof that the ground state of the full localized Weil form is simple with even eigenfunction for every $L \in (0, 1.09]$. The part we believe to be new is $(0.8, 1.09]$**, where the prime powers $5$, $7$ and $8$ enter (at $L = 0.8047$, $0.9730$, $1.0397$). On $(0, 0.8]$ our certificate is an independent computer-assisted confirmation of the range claimed in [KB] (independent of [KB]; not methodologically independent of [Zhu], whose reduction it uses), and at $L = 0.8$ a re-certification of [Zhu, Thm 6.2] with independent code. We have not compared methods with [KB].
+> For $L \le 0.1406$ the ground state is simple and even by the Beurling–Deny argument (explicit threshold in the unrefereed [PL294], cf. the remark in the unrefereed [An1], which builds on [Su §5]; a non-explicit small-$L$ range in [Su, Thm 1.4]; an analytic argument up to $L \le 0.18$ is reported in [MS]). Zhu certified simple-even at the single window $L = 0.8$ [Zhu, Thm 6.2], and Kramarenko-Byrd claims it for every $L \le 0.8$ [KB]. **We give a rigorous, computer-assisted (Arb) proof that the ground state of the full localized Weil form is simple with even eigenfunction for every $L \in (0, 1.19]$. The part we believe to be new is $(0.8, 1.19]$**, where the prime powers $5$, $7$, $8$ and $9$ enter (at $L = 0.8047$, $0.9730$, $1.0397$, $1.0986$). On $(0, 0.8]$ our certificate is an independent computer-assisted confirmation of the range claimed in [KB] (independent of [KB]; not methodologically independent of [Zhu], whose reduction it uses), and at $L = 0.8$ a re-certification of [Zhu, Thm 6.2] with independent code. We have not compared methods with [KB].
 
 **Credit to Zhu.** The whole reduction strategy is Zhu's "one-stroke reduction" [Zhu, Thm 1.1, proved in §4]:
 
@@ -145,11 +146,11 @@ The scale $2\pi e^{A_L}$ in our cutoff rule is Zhu's $T_1$. The per-window certi
 - self-contained proofs of the standard estimates (B), (M), (J), (D) and a Binet-based proof of Zhu's envelope (E) (these are classical facts, not new results), and our own re-derivation and implementation of (R) and (S);
 - a certified covering of a continuum of windows by monotonicity in $L$;
 - a Lipschitz argument at small $L$;
-- the numerics (hybrid Bessel evaluation, and the sharp-cutoff path of §4.6) that reach $L = 1.09$, past the entry of the prime powers 7 and 8.
+- the numerics (hybrid Bessel evaluation, and the sharp-cutoff path of §4.6) that reach $L = 1.19$, past the entry of the prime powers 7, 8 and 9.
 
 **By-products:**
 
-- certified two-sided brackets for $\lambda_0(L)$ at all 27 grid windows. Certified upper bounds on $\lambda_0$ are not new for $L \ge 0.5$ [Zhu, Table 3]. What is new is only the brackets on this particular grid, including the windows below $0.5$. Where the grids overlap ($0.5, 0.6, 0.8, 0.9, 1.0$), the $U$ of the corrected original certificate (Table 1) is smaller than Zhu's Table 3 values. In the certificate of record (Table 2) this holds at $0.5, 0.6, 0.9$ and $1.0$ but not at $0.8$ ($3.681\cdot10^{-17}$ against $2.27\cdot10^{-17}$);
+- certified two-sided brackets for $\lambda_0(L)$ at all 31 grid windows. Certified upper bounds on $\lambda_0$ are not new for $L \ge 0.5$ [Zhu, Table 3]. What is new is only the brackets on this particular grid, including the windows below $0.5$. Where the grids overlap ($0.5, 0.6, 0.8, 0.9, 1.0$), the $U$ of the corrected original certificate (Table 1) is smaller than Zhu's Table 3 values. In the certificate of record (Table 2) this holds at $0.5, 0.6, 0.9$ and $1.0$ but not at $0.8$ ($3.681\cdot10^{-17}$ against $2.27\cdot10^{-17}$);
 - a reproduction of [Zhu, Thm 1.2]. It uses independent code but not an independent method, since it has the same normalization and cutoff strategy.
 
 **Not claimed as new:**
@@ -255,10 +256,10 @@ $$\lambda_0(L) \le \lambda_0(L_i) \le U(L_i), \qquad \lambda_1^{\mathrm{even}}(L
 
 ## 3. Main theorem
 
-**Theorem.** For every $L \in (0, 1.09]$, the lowest eigenvalue of Weil's quadratic form for $\zeta$ on $L^2(-L, L)$ is simple and its eigenfunction is even. Here the form is taken on the log scale, with pole terms and all prime powers with $\log n < 2L$ (§2). Quantitatively:
+**Theorem.** For every $L \in (0, 1.19]$, the lowest eigenvalue of Weil's quadratic form for $\zeta$ on $L^2(-L, L)$ is simple and its eigenfunction is even. Here the form is taken on the log scale, with pole terms and all prime powers with $\log n < 2L$ (§2). Quantitatively:
 
 - On $(0, 0.05]$: $\lambda_1^{\mathrm{even}} - \lambda_0 \ge 0.4172$ and $\lambda_0^{\mathrm{odd}} - \lambda_0 \ge 0.6624$.
-- On each grid step $[L_i, L_{i+1}] \subset [0.05, 1.09]$: $\min(\lambda_1^{\mathrm{even}}, \lambda_0^{\mathrm{odd}})/\lambda_0 \ge \rho_i$, with $\rho_i \ge 1.288$ for every step (Table 2).
+- On each grid step $[L_i, L_{i+1}] \subset [0.05, 1.19]$: $\min(\lambda_1^{\mathrm{even}}, \lambda_0^{\mathrm{odd}})/\lambda_0 \ge \rho_i$, with $\rho_i \ge 1.288$ for every step (Table 2).
 
 These numbers are from the certificate of record (Table 2), outward-rounded lower ends. (The corrected original certificate gives $0.4173$, $0.6625$ and $1.288$ on $(0, 1]$; Table 1.)
 
@@ -267,7 +268,7 @@ The proof is computer-assisted and uses Arb ball arithmetic in two places:
 - python-flint 0.9.0, which bundles FLINT 3.6.0;
 - the C tools `vchol` and `veig`, linked against the system FLINT 3.4 (FLINT on the cluster hosts not recorded).
 
-**Reproducibility status of the certificate.** The certificate of record is `data/theorem_bounds.json`: the clean rerun for $L \le 1$ (one code revision, corrected Gauss–Legendre radius folded into every entry, remote code checked by SHA-256) and the extension run for $L = 1.03, 1.06, 1.09$. The windows $L > 1$ were certified with the sharp-cutoff path (§4.6); its validation at $L = 1$ is in §4.6. The original runs and their correction (Erratum) are history; the theorem does not depend on them.
+**Reproducibility status of the certificate.** The certificate of record is `data/theorem_bounds.json`: the clean rerun for $L \le 1$ (one code revision, corrected Gauss–Legendre radius folded into every entry, remote code checked by SHA-256) and the extension run for $L = 1.03, 1.06, 1.09$ and its continuation for $L = 1.12, 1.15, 1.18, 1.19$ (triangular head assembly, Erratum, further issues, item 4). The windows $L > 1$ were certified with the sharp-cutoff path (§4.6); its validation at $L = 1$ is in §4.6. The original runs and their correction (Erratum) are history; the theorem does not depend on them.
 
 The theorem is also subject to the normalization caveat: the form is matched to CvS/CCM only up to positive affine rescaling (§7.3).
 
@@ -352,17 +353,17 @@ The exact lower ends are $0.417374$ and $0.662537$, recomputed from `theorem_bou
 ### 4.2 Piece II: the grid (`theorem.py`, re-checked by `gl_correction.py`)
 
 The grid is
-$$0.05,\ 0.1,\ 0.2,\ 0.3,\ 0.35,\ 0.4,\ 0.45,\ 0.5,\ 0.55,\ 0.6,\ 0.64,\ 0.68,\ 0.72,\ 0.76,\ 0.8,\ 0.84,\ 0.87,\ 0.9,\ 0.93,\ 0.96,\ 0.97,\ 0.98,\ 0.99,\ 1.0,\ 1.03,\ 1.06,\ 1.09.$$
+$$0.05,\ 0.1,\ 0.2,\ 0.3,\ 0.35,\ 0.4,\ 0.45,\ 0.5,\ 0.55,\ 0.6,\ 0.64,\ 0.68,\ 0.72,\ 0.76,\ 0.8,\ 0.84,\ 0.87,\ 0.9,\ 0.93,\ 0.96,\ 0.97,\ 0.98,\ 0.99,\ 1.0,\ 1.03,\ 1.06,\ 1.09,\ 1.12,\ 1.15,\ 1.18,\ 1.19.$$
 
 For each step $[L_i, L_{i+1}]$ we check
 $$\min\big(\ell_1(L_{i+1}),\ \ell_{\mathrm{odd}}(L_{i+1})\big) > U(L_i).$$
 
 By Lemma 2.3 this gives $\lambda_0(L) < \min(\lambda_1^{\mathrm{even}}(L), \lambda_0^{\mathrm{odd}}(L))$ on the whole step. Prime-power entries inside a step are harmless, because Lemma 2.3 holds across them.
 
-All 23 steps on $[0.05, 1]$ pass with the corrected bounds (ratios in Table 1), and all 26 steps on $[0.05, 1.09]$ pass with the certificate of record (ratios in Table 2).
+All 23 steps on $[0.05, 1]$ pass with the corrected bounds (ratios in Table 1), and all 30 steps on $[0.05, 1.19]$ pass with the certificate of record (ratios in Table 2).
 
 - The smallest margins are at the low end: $1.288$ on $[0.05, 0.1]$ and $1.320$ on $[0.1, 0.2]$.
-- From $[0.96, 0.97]$ to $[0.99, 1]$ the ratios are $332.7$–$380.0$ (Table 1; in Table 2: $255.3$–$354.9$, and past $L = 1$: $10.00$, $6.548$, $3.774$).
+- From $[0.96, 0.97]$ to $[0.99, 1]$ the ratios are $332.7$–$380.0$ (Table 1; in Table 2: $255.3$–$354.9$, and past $L = 1$: $10.00$, $6.548$, $3.774$, $3.933$, $2.857$, $2.148$, $264.7$).
 
 **How the minimum is taken.** Both `theorem.py` and `gl_correction.py` use Python's built-in `min` on Arb balls. That is not a rigorous minimum when the balls overlap. Here it is harmless: in `theorem_bounds_corrected.json`, $\ell_1$ and $\ell_{\mathrm{odd}}$ are disjoint at every window.
 
@@ -374,7 +375,7 @@ The ratios in Table 1 were recomputed with explicit endpoint comparisons.
 **Remark (dyadic windows).** The code certifies each window at the dyadic number $\tilde L_i$ = `arb(L_i).upper()`, which satisfies $L_i \le \tilde L_i < L_i + 2^{-p}$ at working precision $p \ge 768$.
 
 - All four bounds of a window, including the trial function in §4.4, refer to $[-\tilde L_i, \tilde L_i]$.
-- The covering is therefore $(0, \tilde L_1] \cup \bigcup_i [\tilde L_i, \tilde L_{i+1}]$. Since $\tilde L_{27} = 1.09$ up to $2^{-p}$ and $\tilde L_{27} \ge 1.09$, this covers $(0, 1.09]$.
+- The covering is therefore $(0, \tilde L_1] \cup \bigcup_i [\tilde L_i, \tilde L_{i+1}]$. Since $\tilde L_{31} = 1.19$ up to $2^{-p}$ and $\tilde L_{31} \ge 1.19$, this covers $(0, 1.19]$.
 - In Piece I, $L_0$ enters as the ball `arb("0.05")`, which contains $\tilde L_1$, and all bounds there are monotone in $L$.
 
 ### 4.3 Per-window lower bounds (`certify.py`)
@@ -580,9 +581,9 @@ They are not necessarily sharp at the top orders.
 
 ### 4.6 Sharp cutoff for $L \ge 1$ (`SHARP_TS`, `psi_floor`; extension windows)
 
-With the cutoff rule of §4.3, $T^\#$ grows like $2\pi e^{A_L + 1/2}$: $3610$ at $L = 1$ and $5890$ at $L = 1.06$, where $n = 8$ enters. The head size $N \approx eLT^\#/4$ and the Bessel precision grow with it. The prime comb reaches $-A_L$ only near isolated large $t$, so $\Psi_L$ is usually well above the envelope bound. For the windows listed in `certify.SHARP_TS` the code therefore uses a smaller cutoff:
+With the cutoff rule of §4.3, $T^\#$ grows like $2\pi e^{A_L + 1/2}$: $3610$ at $L = 1$, $5890$ at $L = 1.06$, where $n = 8$ enters, and $12250$ at $L = 1.12$, after $n = 9$ has entered. The head size $N \approx eLT^\#/4$ and the Bessel precision grow with it. The prime comb reaches $-A_L$ only near isolated large $t$, so $\Psi_L$ is usually well above the envelope bound. For the windows listed in `certify.SHARP_TS` the code therefore uses a smaller cutoff:
 
-- **Cutoff.** $T^\# = 2450$ for $L = 1.0, 1.03$ and $T^\# = 4000$ for $L = 1.06, 1.09$. The crude cutoff of §4.3 is kept as $T_2$ ($3610$, resp. $5890$).
+- **Cutoff.** $T^\# = 2450$ for $L = 1.0, 1.03$, $T^\# = 4000$ for $L = 1.06, 1.09$ and $T^\# = 5550$ for $L = 1.12, 1.15, 1.18, 1.19$. The crude cutoff of §4.3 is kept as $T_2$ ($3610$, $5890$, resp. $12250$).
 - **Floor $\beta$.** $\beta = 3/16$, an exact dyadic number. The code asserts $\log(T_2/2\pi) - 1/T_2 - A_L \ge 3/16$, so by Lemma (E) $\Psi_L \ge \beta$ on $[T_2, \infty)$.
 - **The gap $[T^\#, T_2]$** (`psi_floor`). $\Psi_L > \beta$ is certified by Arb enclosures of $\Psi_L$ on cells of width $0.01$; a cell whose enclosure is not above $\beta$ is bisected, and the code stops with an error if a cell would become narrower than $10^{-9}$.
 - Together, $\Psi_L \ge \beta$ on $[T^\#, \infty)$. That is all Lemma (R) needs, so (R), (S) and the tail bounds of §4.3 apply unchanged with this $T^\#$ and $\beta$.
@@ -594,8 +595,12 @@ With the cutoff rule of §4.3, $T^\#$ grows like $2\pi e^{A_L + 1/2}$: $3610$ at
 | 1.03 | 2,3,4,5,7 | 2450 | 3610 | 1795 | 6144 | 2859 s |
 | 1.06 | 2,3,4,5,7,8 | 4000 | 5890 | 2962 | 7680 | 11022 s |
 | 1.09 | 2,3,4,5,7,8 | 4000 | 5890 | 3043 | 7680 | 11760 s |
+| 1.12 | 2,3,4,5,7,8,9 | 5550 | 12250 | 4305 | 11264 | 24794 s |
+| 1.15 | 2,3,4,5,7,8,9 | 5550 | 12250 | 4418 | 11264 | ≈ 6 h 33 min + 2471 s |
+| 1.18 | 2,3,4,5,7,8,9 | 5550 | 12250 | 4531 | 11776 | ≈ 6 h 58 min + 3817 s |
+| 1.19 | 2,3,4,5,7,8,9 | 5550 | 12250 | 4569 | 11776 | ≈ 6 h 59 min + 4769 s |
 
-The wall times are from `data/logs/run_extend.log` (for 1.06 and 1.09, the differences of the elapsed times printed after the resume). All four ran on the cluster with `CERT_BESSEL_PREC=6144 CERT_MATMUL_PREC=320 CERT_VCHOL_PREC=384` and the default `CERT_MARGIN`, `CERT_DDIV`.
+The wall times are from `data/logs/run_extend.log` (for 1.06 and 1.09, the differences of the elapsed times printed after the resume). All windows ran with `CERT_BESSEL_PREC=6144 CERT_MATMUL_PREC=320 CERT_VCHOL_PREC=384` and the default `CERT_MARGIN`, `CERT_DDIV`; 1.12–1.19 also with the default `CERT_PREC` (768) and the triangular head assembly (Erratum, further issues, item 4). The windows up to 1.12 ran one at a time: cluster assembly of both heads, then certification on the coordinator. At 1.12 the 24794 s (25 Oct 15:12–22:06) split into about 6 h 10 min of assembly and about 44 min of local certification. For 1.15, 1.18 and 1.19 the runs were **pipelined**: `prefetch.py`, coordinated from one cluster host, assembled the heads of window $k+1$ on the cluster while the laptop certified window $k$ from the cached heads. Their wall-time entries are therefore two numbers that overlap in time with neighbouring windows and should not be added across rows: the cluster assembly time (approximate, from log timestamps) plus the elapsed time printed by the local certification. The whole continuation $1.12$–$1.19$ took from 25 Oct 15:12 to 26 Oct 19:41 (SAST), about 28.5 h.
 
 **Validation at $L = 1$** (`validate10.py`, `data/validate_1.0.json`). The sharp path recertifies $L = 1$ with $T^\# = 2450$, $N = 1745$:
 $$4.978\cdot10^{-30} \le \lambda_0 \le 9.406\cdot10^{-30}, \qquad \lambda_1^{\mathrm{even}} \ge 1.808\cdot10^{-23}, \qquad \lambda_0^{\mathrm{odd}} \ge 1.255\cdot10^{-26},$$
@@ -686,8 +691,12 @@ The gaps for Piece I on $(0, 0.05]$ are $\lambda_1^{\mathrm{even}} - \lambda_0 \
 | 1.03 | 2.096e-32 | 4.110e-32 | 1.055e-25 | 6.604e-29 | odd | 1.961 | 10.00 |
 | 1.06 | 7.275e-35 | 1.249e-34 | 4.435e-28 | 2.691e-31 | odd | 1.716 | 6.548 |
 | 1.09 | 1.306e-37 | 2.162e-37 | 1.034e-30 | 4.711e-34 | odd | 1.655 | 3.774 |
+| 1.12 | 1.903e-40 | 3.001e-40 | 2.049e-33 | 8.502e-37 | odd | 1.577 | 3.933 |
+| 1.15 | 1.752e-43 | 2.799e-43 | 2.501e-36 | 8.572e-40 | odd | 1.597 | 2.857 |
+| 1.18 | 9.792e-47 | 1.636e-46 | 2.088e-39 | 6.011e-43 | odd | 1.670 | 2.148 |
+| 1.19 | 7.823e-48 | 1.312e-47 | 1.439e-40 | 4.329e-44 | odd | 1.677 | 264.7 |
 
-Piece I on the certificate of record: $\lambda_1^{\mathrm{even}} - \lambda_0 \ge 0.4172$ and $\lambda_0^{\mathrm{odd}} - \lambda_0 \ge 0.6624$ on $(0, 0.05]$, with $C_{\mathrm{even}} \le 4.876362$, $C_{\mathrm{odd}} \le 0.761666$. The smallest step ratios are $1.288$ ($[0.05, 0.1]$), $1.320$ ($[0.1, 0.2]$) and, past $L = 1$, $3.774$ ($[1.06, 1.09]$). The odd sector binds at every window from $L = 0.1$ on.
+Piece I on the certificate of record: $\lambda_1^{\mathrm{even}} - \lambda_0 \ge 0.4172$ and $\lambda_0^{\mathrm{odd}} - \lambda_0 \ge 0.6624$ on $(0, 0.05]$, with $C_{\mathrm{even}} \le 4.876362$, $C_{\mathrm{odd}} \le 0.761666$. The smallest step ratios are $1.288$ ($[0.05, 0.1]$), $1.320$ ($[0.1, 0.2]$) and, past $L = 1$, $2.148$ ($[1.15, 1.18]$); past $L = 1$ the margins shrink step by step from $[1.09, 1.12]$ on ($3.933$, $2.857$, $2.148$; the short step $[1.18, 1.19]$ gives $264.7$). The log prints midpoints (e.g. $3.934$ at $[1.09, 1.12]$); the table floors lower ends. The odd sector binds at every window from $L = 0.1$ on.
 
 ---
 
@@ -701,7 +710,7 @@ Piece I on the certificate of record: $\lambda_1^{\mathrm{even}} - \lambda_0 \ge
 
 ### What the certificate consists of
 
-1. **Certificate of record.** `data/theorem_bounds.json` (27 windows) and the gluing in `code/theorem.py` (Piece I and Piece II). The rows $L \le 1$ are copied verbatim from the clean rerun, the rows $L > 1$ verbatim from the extension run; provenance is in `data/README.md`. `python code/theorem.py --check` re-checks the gluing (`data/logs/check.log`).
+1. **Certificate of record.** `data/theorem_bounds.json` (31 windows) and the gluing in `code/theorem.py` (Piece I and Piece II). The rows $L \le 1$ are copied verbatim from the clean rerun, the rows $1.03$–$1.09$ verbatim from the extension run (pre-triangular code), and the rows $1.12$–$1.19$ verbatim from its continuation (triangular code). The continuation's own bounds file repeats the older rows; they differ from the certificate of record only in the last digit of some radii (the certificate of record's are the same or slightly wider), and the step $[1.09, 1.12]$ was glued with the certificate-of-record row at $1.09$. Provenance is in `data/README.md`. `python code/theorem.py --check` re-checks the gluing (`data/logs/check.log`).
 2. **History.** The original window runs (`run_theorem*.log`, not released) produced `data/history/theorem_bounds_original.json` with successive revisions of the code, all with the Gauss–Legendre off-by-one (§7.2). `code/gl_correction.py` corrected them (`data/history/theorem_bounds_corrected.json`, `data/logs/run_gl_correction.log`). It ran with the code revision of the clean rerun, which differs from `code/` in the sharp-cutoff path (§4.6) and in `node_partial.py` (§Erratum, further issues); re-running it with `code/` would use the sharp parameters at $L = 1$.
 
 ### Commands
@@ -716,6 +725,7 @@ All commands run in `code/` after `make` (which builds `vchol` and `veig`), with
 | `UPTO=0.8 CERT_PREC=768 python theorem.py` | Stage 1 of the rerun: windows $0.05$–$0.8$ (local). Windows already in `./theorem_bounds.json` are reused. |
 | `UPTO=0.97 CLUSTER=user@host1,user@host2,user@host3 CERT_PREC=1536 python theorem.py` | Stage 2: windows $0.84$–$0.97$. Panels are dispatched over ssh to `node_partial.py` on each host, in the directory `CERT_REMOTE_DIR` (default `~/weil`), after a SHA-256 check of the three code files. |
 | `CLUSTER=... CERT_BESSEL_PREC=6144 CERT_MATMUL_PREC=320 CERT_VCHOL_PREC=384 python theorem.py` | Stage 3 and the extension: windows $0.98$ onward. In the rerun, $L = 1$ needed `CERT_MARGIN=1.2 CERT_DDIV=8` (§7.2). With the released code, $L = 1$ is computed by the sharp path (§4.6). |
+| `CLUSTER=... CERT_BESSEL_PREC=6144 CERT_MATMUL_PREC=320 CERT_VCHOL_PREC=384 python prefetch.py 1.15 1.18` | Assembles the heads of the listed windows into `cache/` on the cluster (both sectors concurrently), with the same environment as the certifying run; a later `theorem.py` run then certifies those windows from the cache. Used to pipeline $1.15$–$1.19$ (§4.6). |
 | `python validate10.py` | The sharp-path validation at $L = 1$ (§4.6). Reads `./theorem_bounds.json` for the comparison. |
 | `python gl_correction.py` | Historical: the Gauss–Legendre correction and re-check of the original runs (reads `./theorem_bounds.json`, writes `theorem_bounds_corrected.json`). To re-run it, first copy `../data/history/theorem_bounds_original.json` to `./theorem_bounds.json`. It now imports the released `certify.py`, not the revision it originally ran with (§6, item 2), so byte-exact reproduction of `theorem_bounds_corrected.json` is not guaranteed. |
 
@@ -732,9 +742,9 @@ The local machine (a 20-thread laptop) uses a pool of 20 processes (12 in `gl_co
 | `run_theorem_10.log` | 0.98, 0.99, 1.0 | cluster | 266 min 27 s (4917 s, 5054 s, 6008 s) |
 | `run_gl_correction.log` | all 24 (correction, new $U$, re-check) | local | 1 min 16 s |
 
-Clean rerun (`data/logs/run_rerun.log`): stage 1 local, 18 min 20 s; stage 2 on the cluster, 70 min 48 s; stage 3 on the cluster, 247 min 20 s until $L = 1$ failed with the default margins, then 10 min 34 s to finish $L = 1$ (from the cached heads) with `CERT_MARGIN=1.2 CERT_DDIV=8` and the gluing. Extension (`data/logs/run_extend.log`): validation at $L = 1$ 45 min 46 s; $L = 1.03$ 2859 s; the first attempt at $1.06$ ran out of memory after 230 min 41 s in total; after the fix, $1.06$ and $1.09$ took 11022 s and 11760 s. The windows past $1.09$ in the code's grid ($1.12$–$1.19$) are not certified and not part of the theorem.
+Clean rerun (`data/logs/run_rerun.log`): stage 1 local, 18 min 20 s; stage 2 on the cluster, 70 min 48 s; stage 3 on the cluster, 247 min 20 s until $L = 1$ failed with the default margins, then 10 min 34 s to finish $L = 1$ (from the cached heads) with `CERT_MARGIN=1.2 CERT_DDIV=8` and the gluing. Extension (`data/logs/run_extend.log`): validation at $L = 1$ 45 min 46 s; $L = 1.03$ 2859 s; the first attempt at $1.06$ ran out of memory after 230 min 41 s in total; after the fix, $1.06$ and $1.09$ took 11022 s and 11760 s. Continuation with the triangular code: $1.12$ took 24794 s; $1.15$, $1.18$, $1.19$ were pipelined (cluster assembly about 6.5–7 h per window, local certification 2471 s, 3817 s, 4769 s; §4.6); the continuation as a whole ran from 25 Oct 15:12 to 26 Oct 19:41. The grid ends at $1.19$; nothing past it is certified.
 
-In the cluster runs the `user` times count only the coordinator. For $L \ge 0.98$ the head matrices are cached as ball strings in `cache/head_<L>_<parity>_<N>.txt`, about 225 MB each.
+In the cluster runs the `user` times count only the coordinator. For $L \ge 0.98$ the head matrices are cached as ball strings in `cache/head_<L>_<parity>_<N>.txt`; their size grows like $N^2$, about 160 MB each at $L = 1.0$ and 1.06 GB each at $L = 1.19$.
 
 ### Cross-checks
 
@@ -809,36 +819,37 @@ In the cluster runs the `user` times count only the coordinator. For $L \ge 0.98
    - Zhu's Thm 1.1, Lemma 3.1, Thm 6.2, §5.5, §6 and Table 3 were read from a text extraction of arXiv:2608.24827v2.
    - [PL294] and Andrade's remark are unrefereed, so the overlap on $(0, 0.1406]$ should be read with that in mind.
    - Whether the mathia notes are AI-generated is not documented in `NOVELTY.md`, and we have not checked it.
-8. **Reason for extra care near and past $L \approx 1$.** Zhu §7 retracted an earlier certified-positivity claim at $L = 1.19$. One constant error has already been found and corrected here (Gauss–Legendre off-by-one). The following bounds near $L \approx 1$ deserve an independent audit:
+8. **Reason for extra care near and past $L \approx 1$.** Zhu §7 retracted an earlier certified-positivity claim at $L = 1.19$. That is exactly the last window of our grid: our bracket there ($\lambda_0(1.19) \ge 7.823\cdot10^{-48}$) implies positivity at that $L$, rests on the unreviewed sharp-cutoff and triangular code, and is the window most in need of independent checking. One constant error has already been found and corrected here (Gauss–Legendre off-by-one). The following bounds near $L \approx 1$ deserve an independent audit:
    - $e_D$ and $e_B$;
    - the $10^{-100}$ drop bound;
    - the 60-digit transport;
    - the hybrid Bessel seeds;
-   - `psi_floor` and the sharp-cutoff parameters (§4.6), used only for $L > 1$ in the certificate of record. This path and the windows $1.03$–$1.09$ have not been through any review round, internal or external (the review log, §10, predates them).
+   - `psi_floor` and the sharp-cutoff parameters (§4.6), used only for $L > 1$ in the certificate of record. This path and the windows $1.03$–$1.19$ have not been through any review round, internal or external (the review log, §10, predates them);
+   - the triangular head assembly in `_partial`/`node_partial.py` (Erratum, further issues, item 4), used only for $1.12$–$1.19$. Its only check is the one-off byte-identical comparison with the old code at three small cases.
 
-   The step ratios near $L = 1$ ($255.3$–$354.9$ in Table 2) leave a large margin, but past $L = 1$ they are smaller ($10.00$, $6.548$, $3.774$), and margin does not make up for a wrong bound.
+   The step ratios near $L = 1$ ($255.3$–$354.9$ in Table 2) leave a large margin, but past $L = 1$ they are smaller, and from $[1.09, 1.12]$ on shrinking ($10.00$, $6.548$, $3.774$, $3.933$, $2.857$, $2.148$), and margin does not make up for a wrong bound.
 9. **Stale docstrings.** Where they differ from this note, this note supersedes them:
    - the `head()` docstring, which gives the cache filename without `_<N>`;
    - the `bessel_rec.py` module docstring, "STATUS: prototype". It refers to `sph_bessel_all`; the re-seeded hybrid is the fix;
    - the `vchol.c` header, which says $d = \lambda/100$; the divisor is now the optional fourth argument (`CERT_DDIV`, default 100).
 
    Development notes not in this release (`README.md`, `REDUCTION.md`, `NOVELTY.md`) predate this note. `REDUCTION.md`'s statement "Certified for every $L \in (0, 0.8]$" and its reliance on an unverified survey "Fact 6.4" are not part of this theorem.
-10. **Scope.** The theorem says nothing for $L > 1.09$. The code's grid continues to $1.19$, but those windows are not certified. Each further window costs several hours on the cluster, and memory per worker grows like $N^2$ (Erratum, further issues).
-11. **Future work, not part of this theorem.** `REDUCTION.md` reduces a convergence statement towards RH to the simple-even hypothesis plus a gap-ratio condition along some sequence $L_j \to \infty$. That reduction is conditional on unverified normalization and on the survey's Fact 6.4. This note supplies the hypothesis only on $(0, 1.09]$ and makes no claim about that programme.
+10. **Scope.** The theorem says nothing for $L > 1.19$. The prime $11$ enters at $L = \tfrac12\log 11 \approx 1.1989$, just past the last window, and raises $A_L$ and hence the cutoff; going past it needs new parameters and new runs. The step margins past $L = 1.09$ are shrinking ($3.933$, $2.857$, $2.148$). Each further window costs about 7 h of cluster assembly plus about an hour of local certification, and memory per worker still grows like $N^2$ (Erratum, further issues).
+11. **Future work, not part of this theorem.** `REDUCTION.md` reduces a convergence statement towards RH to the simple-even hypothesis plus a gap-ratio condition along some sequence $L_j \to \infty$. That reduction is conditional on unverified normalization and on the survey's Fact 6.4. This note supplies the hypothesis only on $(0, 1.19]$ and makes no claim about that programme.
 
 ---
 
 ## 8. Conclusion
 
-We certify, by Arb ball arithmetic, that the full localized Weil form for $\zeta$ on $L^2(-L, L)$ has a simple ground state with even eigenfunction for every $L \in (0, 1.09]$. The part we believe to be new is $(0.8, 1.09]$; simple-even on $(0, 0.8]$ is claimed in [KB].
+We certify, by Arb ball arithmetic, that the full localized Weil form for $\zeta$ on $L^2(-L, L)$ has a simple ground state with even eigenfunction for every $L \in (0, 1.19]$. The part we believe to be new is $(0.8, 1.19]$; simple-even on $(0, 0.8]$ is claimed in [KB].
 
 **Beyond $L = 1$ (non-rigorous, Appendix A).** The staircase states are, to $1 - \cos \le 10^{-4}$, the Gram–Schmidt derivative ladder $k_L', k_L'', \dots$ of the ground state, which explains the parity alternation. Oscillation (Sturm) structure fails from the 5th state. Every all-$L$ reformulation we tried hides a scalar margin that shrinks about as fast as $\lambda_0$ (e.g. $1 - F \approx 5\cdot10^{-25}$ at $L = 1$, first-order estimate, A.3), which is why soft arguments cannot extend the theorem to all $L$.
 
 **Margins** (certificate of record, Table 2):
 
 - Piece I gaps: $\ge 0.4172$ (even) and $\ge 0.6624$ (odd).
-- Piece II step ratios: $\ge 1.288$; past $L = 1$, $\ge 3.774$.
-- Two-sided $\lambda_0$ brackets at 27 windows, each of relative width at most $3.761\times$ (at most $1.72\times$ at the 24 windows of the corrected original certificate, Table 1).
+- Piece II step ratios: $\ge 1.288$; past $L = 1$, $\ge 2.148$.
+- Two-sided $\lambda_0$ brackets at 31 windows, each of relative width at most $3.761\times$ (at most $1.72\times$ at the 24 windows of the corrected original certificate, Table 1).
 
 **Erratum.** A Gauss–Legendre error constant was off by one node in the original runs. It is fixed in the code. The certificate was corrected by a Weyl shift of all lower bounds by $\delta \le 3.2\cdot10^{-32}$ and freshly certified $U$ values. Under the assumption that the window parameters are unchanged between code revisions (§7.2), the theorem holds with the corrected numbers. The clean rerun (§7.2) confirms it without that assumption.
 
@@ -954,7 +965,7 @@ Scripts (in `exploratory/`; non-rigorous): `osc.py`, `osc2.py`, `ladder.py`; rev
 
 ## 10. Review log
 
-All reviewers below were AI agents (Claude) run by the author; none is an independent human referee. All rounds predate the sharp-cutoff path (§4.6) and the windows $1.03$–$1.09$.
+All reviewers below were AI agents (Claude) run by the author; none is an independent human referee. All rounds predate the sharp-cutoff path (§4.6), the windows $1.03$–$1.19$ and the triangular head assembly used for $1.12$–$1.19$ (Erratum, further issues, item 4); none of these has been through any review round.
 
 **Verification method, round 1.** Each issue was checked against the code, logs and JSON before it was applied. We also ran three light computations:
 

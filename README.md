@@ -1,7 +1,7 @@
-# Simple, even ground state of the localized Weil form for L in (0, 1.09]
+# Simple, even ground state of the localized Weil form for L in (0, 1.19]
 
 This is a computer-assisted proof, using Arb/FLINT ball arithmetic, of the following statement. For every window
-half-width `L` in `(0, 1.09]`, the lowest eigenvalue of Weil's quadratic form for the Riemann zeta function on
+half-width `L` in `(0, 1.19]`, the lowest eigenvalue of Weil's quadratic form for the Riemann zeta function on
 `L^2(-L, L)` is simple, and its eigenfunction is even.
 
 **Please read this first.**
@@ -16,7 +16,7 @@ half-width `L` in `(0, 1.09]`, the lowest eigenvalue of Weil's quadratic form fo
   eigenfunction" is one hypothesis. Assumed for a given `L`, it implies that the Fourier transform of that ground state
   has only real zeros. Reaching RH would also need that hypothesis for every `L` and control of the limit `L -> inf`
   (that those zeros converge to the zeta zeros). Neither is addressed here. We verify the hypothesis only on the
-  bounded range `(0, 1.09]`.
+  bounded range `(0, 1.19]`.
 
 The full write-up is [`paper/NOTE.md`](paper/NOTE.md).
 
@@ -26,28 +26,28 @@ Take real `f` supported in `[-L, L]` (log scale) and form `Q(f) = W(f * f~)`. He
 functional. It has the pole terms, the archimedean term `Re psi(1/4 + it/2) - log pi`, and every prime power `n` with
 `log n < 2L` (paper §2). Let `A_L` be the self-adjoint operator of the closed form on `L^2(-L, L)`.
 
-**Theorem.** For every `L` in `(0, 1.09]`, the lowest eigenvalue of `A_L` is simple, and its eigenfunction is even.
+**Theorem.** For every `L` in `(0, 1.19]`, the lowest eigenvalue of `A_L` is simple, and its eigenfunction is even.
 
 The proof has two pieces.
 
 - **Piece I, `(0, 0.05]`.** A Lipschitz argument for a rescaled form, anchored at the certified window `0.05`. The
   gaps are `>= 0.4172` (second even eigenvalue) and `>= 0.6624` (odd sector).
-- **Piece II, `[0.05, 1.09]`.** 27 grid windows. At each one we certify a two-sided bracket for `lambda_0`, a lower
+- **Piece II, `[0.05, 1.19]`.** 31 grid windows. At each one we certify a two-sided bracket for `lambda_0`, a lower
   bound on the second even eigenvalue and a lower bound on the odd sector. Adjacent windows are glued by min-max
-  monotonicity in `L`. Every one of the 26 steps passes. The smallest step ratio is `1.288`, and the smallest past
-  `L = 1` is `3.774`.
+  monotonicity in `L`. Every one of the 30 steps passes. The smallest step ratio is `1.288`, and the smallest past
+  `L = 1` is `2.148`.
 
-The prime powers 2, 3, 4, 5, 7 and 8 all enter inside this range, at `L = (1/2) log n`. The next one, `n = 9`, enters
-at `1.0986`.
+The prime powers 2, 3, 4, 5, 7, 8 and 9 all enter inside this range, at `L = (1/2) log n`. The next one, `n = 11`,
+enters at `1.1989`, just past the range.
 
-The certified numbers are in `data/theorem_bounds.json` (Table 2 of the paper). The code's grid continues to `1.19`,
-but windows past `1.09` are **not** certified and are not claimed.
+The certified numbers are in `data/theorem_bounds.json` (Table 2 of the paper). The code's grid ends at `1.19`;
+windows past `1.19` are **not** certified and are not claimed.
 
 ## What is new, and what is not
 
 The convention throughout is that `L` is the half-width and `p^k` enters when `log p^k < 2L`.
 
-- **Believed new: `(0.8, 1.09]`.** Our search, last refreshed 2026-10-25, found no public proof or certificate of
+- **Believed new: `(0.8, 1.19]`.** Our search, last refreshed 2026-10-25, found no public proof or certificate of
   simple-even for any continuum window `L > 0.8`. The only exception is the non-explicit neighbourhood of `0.8` in
   mathia PL-287. Andrade (Zenodo 20887028) and Andrews Jr. (Zenodo 22715669) certify simple-even for *finite* Galerkin matrices at
   `L ≈ 1.28, 1.68, 1.99`; those are not statements about the continuum form. Much of this literature is unrefereed
@@ -77,7 +77,7 @@ Our own contributions are:
 
 - the certified covering of a continuum of windows by monotonicity;
 - the Lipschitz piece at small `L`;
-- the numerics that reach `L = 1.09`: a hybrid rigorous spherical Bessel evaluation (classical
+- the numerics that reach `L = 1.19`: a hybrid rigorous spherical Bessel evaluation (classical
   recurrence / continued-fraction scheme, cf. Gautschi 1967), and a sharper cutoff certified by
   interval subdivision (`psi_floor`, paper §4.6);
 - write-ups of standard estimates and re-derivations of Zhu's lemmas.
@@ -98,12 +98,15 @@ These are taken from paper §7.
    rigorous when balls overlap. In every current use they are separated by many orders of magnitude.
 4. **Piece I precision anomaly.** The certified upper end of one integral grows with working precision (paper §7.5).
    We use the largest value. The cause is not explained.
-5. **Past `L = 1`.** The step ratios there are smaller (10.00, 6.548, 3.774), and the sharp-cutoff path is used only
-   there. Zhu retracted an earlier positivity claim at `L = 1.19`. One error constant (Gauss–Legendre, off by one node)
+5. **Past `L = 1`.** The step ratios there are smaller (10.00, 6.548, 3.774, 3.933, 2.857, 2.148, 264.7), and the
+   sharp-cutoff path is used only there. Zhu retracted an earlier positivity claim at `L = 1.19`, which is exactly our
+   last window: our bracket there (`lambda_0 >= 7.823e-48`) implies positivity at that `L`, rests on the unreviewed
+   sharp-cutoff and triangular code, and is the window most in need of independent checking. One error constant (Gauss–Legendre, off by one node)
    has already been found and corrected in this project; see the erratum in the paper. The tail bounds, the drop
    bound, the transport precision, the Bessel seeds and `psi_floor` deserve an independent audit. The sharp-cutoff
-   path and the windows 1.03–1.09, which carry the novelty claim, have not been through any review round, internal or
-   external.
+   path and the windows 1.03–1.19, which carry the novelty claim, have not been through any review round, internal or
+   external. Nor has the upper-triangle panel summation in `certify.py` / `node_partial.py` that produced the windows
+   1.12–1.19 (byte-identical to the previous full-product code on spot checks at `L = 0.3`, `0.8`, `1.0`).
 6. **Sources not fully read.** Liu, the MATHSOLVE argument and the Kramarenko-Byrd proof were not read or checked in
    full. Zhu was read from a text extraction of v2.
 
@@ -130,7 +133,7 @@ cd code && python theorem.py --check
 
 This re-runs Piece I, including the Lipschitz constants at 768 bits, and every Piece II step on
 `data/theorem_bounds.json`. It uses the longest prefix of the grid present in the file. It should end with
-`THEOREM CERTIFIED for all L in (0, 1.09]` (compare `data/logs/check.log`). It does **not** recompute any window.
+`THEOREM CERTIFIED for all L in (0, 1.19]` (compare `data/logs/check.log`). It does **not** recompute any window.
 
 ### Recompute windows
 
@@ -166,10 +169,13 @@ We used a 3-node cluster with 64 cores per node. Observed times on it were:
 | `0.98`, `0.99` | about 85 min per window |
 | `1.03` | 48 min |
 | `1.06`, `1.09` | 3 h 04 min and 3 h 16 min |
+| `1.12` | 6 h 53 min (cluster assembly, then about 44 min local certification) |
+| `1.15`, `1.18`, `1.19` | pipelined: cluster assembly (`prefetch.py`) about 6 h 33 min, 6 h 58 min and 6 h 59 min; local certification 41, 64 and 79 min, overlapped with assembly of the next window |
 
-Memory per worker grows like `N^2`: about 1.75 GB at `N = 2962`. `node_partial.py` caps the number of workers by
-available memory (`CERT_NODE_PROCS` overrides it). For `L >= 0.98` the cached head matrices in `code/cache/` are
-about 225 MB each.
+Memory per worker grows like `N^2`: the cap in `node_partial.py` budgets about `100 N^2` bytes per worker (the
+upper-triangle sums, measured 0.87 GB at `N = 4305`, plus the ~0.75 GB shared-memory file) and limits the number of
+workers by available memory (`CERT_NODE_PROCS` overrides it). The cached head matrices in `code/cache/` also grow like
+`N^2`: about 160 MB each at `L = 1.0`, 1.06 GB each at `L = 1.19`.
 
 Other environment variables:
 
@@ -192,7 +198,8 @@ code/certify.py         per-window certificate: lower bounds (frequency side, Zh
 code/theorem.py         grid + Piece I + Piece II gluing; --check mode
 code/lipschitz.py       Piece I constants
 code/bessel_rec.py      rigorous hybrid spherical Bessel evaluation (used for L >= 0.98)
-code/node_partial.py    cluster worker (panel sums), memory-capped
+code/node_partial.py    cluster worker (upper-triangle panel sums), memory-capped
+code/prefetch.py        assembles head matrices on the cluster ahead of the certifying run (pipelining)
 code/vchol.c            verified Cholesky (C, FLINT)
 code/veig.c             inverse-iteration estimates (non-rigorous, only to choose what to certify)
 code/validate10.py      sharp-path validation at L = 1.0
@@ -269,7 +276,7 @@ Corrections and error reports are very welcome.
 See `CITATION.cff`:
 
 > Johann Alexander Botha, *A certified simple, even ground state of the localized Weil quadratic form for all windows
-> L in (0, 1.09]*, computer-assisted note and code, version 2026-10-25, unrefereed, produced with AI assistance.
+> L in (0, 1.19]*, computer-assisted note and code, version 2026-10-26, unrefereed, produced with AI assistance.
 
 Please also cite Zhu (arXiv:2608.24827), whose reduction the proof uses, and the prior work listed above where
 relevant.
