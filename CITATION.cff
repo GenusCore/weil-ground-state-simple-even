@@ -1,13 +1,14 @@
 cff-version: 1.2.0
 message: "If you use this work, please cite it as below. It is unrefereed and was produced largely with AI assistance (see README.md)."
-title: "A certified simple, even ground state of the localized Weil quadratic form for all windows L in (0, 1.19]"
+title: "A certified simple, even ground state of the localized Weil quadratic form for all windows L in (0, 1.4035]"
+abstract: "Computer-assisted proof, in Arb ball arithmetic, that the lowest eigenvalue of the localized Weil quadratic form for the Riemann zeta function on L^2(-L, L) is simple with an even eigenfunction for every L in (0, 1.4035]. Pieces I-II cover (0, 1.19] (release of 2026-10-26); Piece III covers [1.19, 1.4035] with second-eigenvalue lower bounds from Elston's certifier plus a rank-one deflation and rigorous Legendre-Galerkin upper bounds. Interim release: the extension to L = 1.5 is in progress and not claimed. Unrefereed; produced largely with AI assistance."
 type: software
 authors:
   - given-names: "Johann Alexander"
     family-names: "Botha"
     email: "info@genuscore.com"
-version: "2026-10-26"
-date-released: "2026-10-26"
+version: "1.1.0"
+date-released: "2026-10-31"
 license: MIT
 keywords:
   - Weil explicit formula
@@ -32,3 +33,12 @@ references:
     journal: "IEEE Transactions on Computers"
     volume: 66
     year: 2017
+  - type: software
+    title: "weil-windows"
+    authors:
+      - family-names: Elston
+        given-names: Zac
+    identifiers:
+      - type: doi
+        value: "10.5281/zenodo.23174403"
+    notes: "Window-compressed prime-norm certifier; produces every Piece III lower bound (used with an added --deflate option)."

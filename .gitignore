@@ -8,4 +8,5 @@ code/theorem_bounds_corrected.json
 code/validate_1.0.json
 *.log
 !data/logs/*.log
+!data/piece3/check.log
 .venv/

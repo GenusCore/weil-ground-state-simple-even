@@ -1,0 +1,17 @@
+             step        U(L_i)   l2_even(L_i+1)   l1_odd(L_i+1)  ratio   pass
+[1.19, 1.2205]     8.712e-48        4.200e-44       1.224e-47   1.41  True
+[1.2205, 1.25]     2.336e-51        1.162e-47       2.643e-51   1.13  True
+[1.25, 1.2785]     4.457e-55        2.648e-51       5.889e-55   1.32  True
+[1.2785, 1.3055]     8.317e-59        4.806e-55       9.466e-59   1.14  True
+[1.3055, 1.3315]     1.208e-62        9.901e-59       1.707e-62   1.41  True
+[1.3315, 1.3565]     1.692e-66        1.436e-62       2.188e-66   1.29  True
+[1.3565, 1.3805]     1.961e-70        2.247e-66       3.033e-70   1.55  True
+[1.3805, 1.4035]     2.250e-74        2.992e-70       3.493e-74   1.55  True
+[1.4035, 1.4255]  missing: l2 
+[1.4255, 1.447]     2.370e-82        3.421e-78       3.270e-82   1.38  True
+[1.447, 1.468]  missing: l2 odd
+[1.468, 1.4885]  missing: l2 odd
+[1.4885, 1.5]  missing: l2 odd
+Also passing, not contiguous with the certified range (data points only): [1.4255, 1.447] (ratio 1.38)
+NOT (yet) certified on [1.4035, 1.5]
+CERTIFIED: simple-even for all L in [1.19, 1.4035] (contiguous Piece III steps, minimum step ratio 1.132); with Pieces I-II (code/theorem.py --check): simple-even for all L in (0, 1.4035]

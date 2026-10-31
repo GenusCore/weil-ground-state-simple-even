@@ -1,0 +1,653 @@
+\documentclass[11pt]{amsart}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{amssymb,amsmath,mathtools}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{url}
+
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\newcommand{\doi}[1]{doi:\,\href{https://doi.org/#1}{#1}}
+
+% ------------------------------------------------------------------ macros
+\newcommand{\Lmax}{1.4035}                                % right end of the certified range (release 1.1.0; goal 1.5)
+\newcommand{\ev}{\mathrm{ev}}
+\newcommand{\od}{\mathrm{odd}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\re}{\operatorname{Re}}
+\newcommand{\pole}{\mathrm{pole}}
+\newcommand{\Tsh}{T^{\sharp}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\file}[1]{{\small\path{#1}}}
+\newcommand{\e}[1]{\cdot 10^{#1}}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\numberwithin{equation}{section}
+
+\begin{document}
+
+\title[Simple, even ground state of the localized Weil form]{A certified simple, even ground state of the localized Weil quadratic form for all windows $L\in(0,\Lmax]$}
+
+\author{Johann Alexander Botha}
+\address{GenusCore}
+\email{info@genuscore.com}
+
+\date{Version 1.1.0, 31 October 2026}
+
+\subjclass[2020]{11M26 (primary); 65G20, 47A75, 65F15 (secondary)}
+\keywords{Weil explicit formula, Weil positivity, quadratic form, ground state, computer-assisted proof, ball arithmetic}
+
+\begin{abstract}
+Let $Q_L$ be Weil's quadratic form for the Riemann zeta function, restricted to real test functions supported in $[-L,L]$ on the logarithmic scale; it contains the pole terms, the archimedean term and every prime power $n$ with $\log n<2L$. Connes and van Suijlekom proved that if the lowest eigenvalue of the associated self-adjoint operator is simple with an even eigenfunction~$\xi$, then $\hat\xi$ has only real zeros; for the Weil form this ``simple-even'' property is one of the missing steps in the strategy of Connes, Consani and Moscovici. We give a computer-assisted proof, in Arb ball arithmetic, that the ground state of $Q_L$ is simple and even for every $L\in(0,\Lmax]$. The proof combines min-max monotonicity in~$L$ with three pieces: a Lipschitz argument on $(0,0.05]$, a covering of $[0.05,1.19]$ by $31$ certified windows based on Zhu's frequency-cutoff reduction, and a covering of $(1.19,\Lmax]$ by $8$ windows in which second-eigenvalue lower bounds are obtained from Elston's window-compressed prime-norm certifier combined with a rank-one deflation, and upper bounds from Legendre--Galerkin Rayleigh quotients with rigorous quadrature bounds. On $(0,0.8]$ the statement had been claimed before; the range $(0.8,\Lmax]$ is, to our knowledge, new. As by-products we give rigorous upper bounds for the lowest eigenvalue in both parity sectors up to $L=2.25$.
+The extension of the same computation to $L=1.5$ is in progress.
+\end{abstract}
+
+\maketitle
+
+\setcounter{tocdepth}{1}
+\tableofcontents
+
+% =====================================================================
+\section{Introduction}\label{sec:intro}
+
+\subsection{The localized Weil form}
+For a real function $f\in L^2(\R)$ with support in $[-L,L]$ put $\tilde f(x)=f(-x)$, $g=f*\tilde f$ and $F(z)=\hat f(z)=\int f(x)e^{izx}\,dx$. Weil's explicit-formula functional~\cite{Weil}, evaluated at~$g$, gives the quadratic form
+\begin{multline}\label{eq:weil}
+Q_L(f)=W(g),\qquad
+W(g)=\hat g(\tfrac i2)+\hat g(-\tfrac i2)-g(0)\log\pi+\frac1{2\pi}\int_\R\hat g(r)\,\re\psi\bigl(\tfrac14+\tfrac{ir}{2}\bigr)\,dr\\
+-\sum_{n\ge2}\frac{\Lambda(n)}{\sqrt n}\bigl[g(\log n)+g(-\log n)\bigr],
+\end{multline}
+where $\psi=\Gamma'/\Gamma$ and $\Lambda$ is the von Mangoldt function. Weil's criterion states that the Riemann hypothesis (RH) is equivalent to $Q_L(f)\ge0$ for all such $f$ and all $L>0$~\cite{Weil,Bombieri}. Since $g$ is supported in $[-2L,2L]$, only prime powers with $\log n<2L$ contribute; the prime power $n$ enters at $L=\tfrac12\log n$ (Table~\ref{tab:primes}).
+
+\begin{table}[ht]
+\centering\small
+\caption{Prime powers $n$ and the window $L=\tfrac12\log n$ at which they enter the form, for $L\le1.5$.}\label{tab:primes}
+\begin{tabular}{l*{6}{c}}
+\toprule
+$n$ & 2 & 3 & 4 & 5 & 7 & 8\\
+$\tfrac12\log n$ & 0.3466 & 0.5493 & 0.6931 & 0.8047 & 0.9730 & 1.0397\\
+\midrule
+$n$ & 9 & 11 & 13 & 16 & 17 & 19\\
+$\tfrac12\log n$ & 1.0986 & 1.1989 & 1.2825 & 1.3863 & 1.4166 & 1.4722\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{The simple-even hypothesis}
+Connes and van Suijlekom~\cite[Thm.~6.1]{CvS} prove: if a quadratic form with Schwartz kernel $\tilde D(x-y)$, $D$ a real distribution, defines a lower-bounded self-adjoint operator whose lowest spectral value is a \emph{simple, isolated} eigenvalue with \emph{even} eigenfunction $\xi$, then all zeros of the entire function $\hat\xi$ are real. Connes, Consani and Moscovici~\cite{CCM25} propose a strategy towards RH based on a spectral realization of the zeros through the eigenfunctions $\xi_\lambda$ of the Weil form on growing windows; in \cite[\S8]{CCM25} they list two ``missing steps'': (i) the smallest eigenvalue of the Weil quadratic form $QW_\lambda$ is simple with even eigenvector, and (ii) the zeros of $\hat\xi_\lambda$ converge to the nontrivial zeros of $\zeta$. The same two steps are listed in~\cite[\S6.6]{Connes26}. The present paper addresses only step~(i), and only on the bounded range $L\in(0,\Lmax]$; it says nothing about step~(ii) or about large~$L$, and does not prove positivity beyond what the certified lower bounds imply on this range. In the conventions of~\cite{CvS} the operator acts on $L^2([-\tfrac L2,\tfrac L2])$, so their $L$ is twice ours; in~\cite{CCM25} the window is $[\lambda^{-1},\lambda]$ on the multiplicative scale, i.e.\ $L=\log\lambda$. Our form agrees with theirs only up to a positive affine rescaling, see Remark~\ref{rem:affine} and \S\ref{sec:limitations}.
+
+\subsection{Prior work}\label{sec:prior}
+We list what we know to have been proved or claimed; status labels follow the sources. Many items are unrefereed 2026 deposits or preprints, some AI-assisted.
+\begin{itemize}
+\item \emph{Small windows.} Suzuki~\cite[Thm.~1.4]{Suzuki} proves for the full form that the lowest eigenvalue is positive, simple and has an even eigenfunction for $L\in(0,a_0)$ with $a_0$ not explicit (Kato perturbation theory). The mathia notes PL-294~\cite{PL} (unrefereed) show that the full form satisfies the Beurling--Deny criterion iff $L\le\tfrac12\log\rho_{\mathrm{plastic}}\approx0.1406$, which gives a simple ground state of fixed sign. Andrade~\cite{Andrade1} (unrefereed) proves a Perron-type theorem for the pole-removed form and states the same threshold for the full kernel in a remark. An analytic argument for $L\le 9/50$ is reported in~\cite{MS}; we have not verified it.
+\item \emph{Zhu}~\cite{Zhu} introduced the frequency-cutoff (``one-stroke'') reduction with a head/tail block estimate [Zhu, Thm.~1.1] on which all our window certificates rest, certified simple-even at the single window $L=0.8$ [Zhu, Thm.~6.2], and certified variational upper bounds on the lowest eigenvalue for $L\in[0.5,2]$ [Zhu, Table~3]. Zhu [\S7] retracts an earlier positivity claim at $L=1.19$.
+\item \emph{Kramarenko-Byrd}~\cite{KB} (unrefereed) claims a rigorous proof of simple-even for all $0<L\le4/5$ in our half-width convention. We have not checked it. If it is correct, our result on $(0,0.8]$ is an independent confirmation.
+\item \emph{Perturbative simplicity} on a neighbourhood of $L=0.8$ of non-explicit radius: PL-287~\cite{PL}.
+\item \emph{Positivity and per-sector lower bounds} (no simplicity or parity statement): jose-paul-b~\cite{JPB} for $L\le\tfrac12\log7$; Liu~\cite{Liu} at $L=17/16$ (block-Schur bounded comparison, $Q\ge2^{-49162}$); Mori~\cite{Mori} at $L=\tfrac12\log15$; Senke~\cite{Senke} at $L=77/64$; Elder~\cite{Elder} at $L=0.8$; and Elston~\cite{Elston}, whose certified lowest-eigenvalue lower bounds at $L=1.19$, $1.3$ and $1.495$ (e.g.\ $\lambda\ge3.501\e{-96}$ at $L=1.495$) use the certifier we build on in Piece~III.
+\item \emph{Finite matrices.} Andrade~\cite{Andrade2} and Andrews Jr.~\cite{AndrewsJr} certify simple-even for finite Galerkin matrices $QW^N$; these are not statements about the continuum form.
+\item \emph{Classical ancestor.} Yoshida~\cite{Yoshida} combined finitely many pivots with a rigorous high-frequency complement lemma.
+\end{itemize}
+
+\subsection{Contributions}
+\begin{enumerate}
+\item A computer-assisted proof that the ground state of $Q_L$ is simple and even for every $L\in(0,\Lmax]$ (Theorem~\ref{thm:main}). The part we believe to be new is $(0.8,\Lmax]$. The piece $(0,1.19]$ was released earlier as an unrefereed note~\cite{Botha}; this paper reproduces its mathematical content.
+\item A rank-one deflation added to Elston's certifier (Lemma~\ref{lem:deflation}, Corollary~\ref{cor:lambda2}), which turns a certified lowest-eigenvalue bound into a certified \emph{second} even eigenvalue bound at no extra assembly cost.
+\item Rigorous upper bounds for the lowest even and odd eigenvalues up to $L=2.25$ from a fast Legendre convolution recurrence with a rigorous Gauss--Legendre bound (\S\ref{sec:upper}).
+\item Numerical measurements of the weak singular points of the computed minimisers at $|y|=|L-\log n|$ reported by Eberwein~\cite[\S13]{Eberwein} (\S\ref{sec:kinks}); their location is not new.
+\end{enumerate}
+\emph{Not claimed as new:} the range $(0,0.8]$~\cite{KB} and in particular $(0,0.1406]$~\cite{PL}; the window $L=0.8$ by itself [Zhu, Thm.~6.2]; positivity on this range; certified upper bounds on the lowest eigenvalue for $L\in[0.5,2]$ [Zhu, Table~3]; the frequency-cutoff reduction and block estimate [Zhu, Thm.~1.1]; the window-compressed prime-norm reduction and its implementation~\cite{Elston}; the Legendre convolution recurrence~\cite{HaleTownsend}, already used for this problem by Liu~\cite{Liu}.
+
+% =====================================================================
+\section{Setup and normalisation}\label{sec:setup}
+
+\subsection{Frequency side}
+For real $f$ supported in $[-L,L]$ one has $\hat g(t)=F(t)F(-t)=|F(t)|^2$ for real~$t$, and by Plancherel $g(0)=\|f\|^2=\frac1\pi\int_0^\infty|F|^2$. Hence
+\begin{gather}\label{eq:freq}
+Q_L(f)=[\pole]+\frac1\pi\int_0^\infty\Psi_L(t)|F(t)|^2\,dt,\\
+\Psi_L(t)=\re\psi\bigl(\tfrac14+\tfrac{it}2\bigr)-\log\pi-\sum_{\log n<2L}\frac{2\Lambda(n)}{\sqrt n}\cos(t\log n),\notag
+\end{gather}
+with $[\pole]=2F(\tfrac i2)F(-\tfrac i2)$. Here $F(\tfrac i2)=\int fe^{-x/2}$ is real; for even $f$, $[\pole]=+2F(\tfrac i2)^2$, and for odd $f$, $[\pole]=-2F(\tfrac i2)^2$. This normalisation is that of Zhu [Zhu, \S6]; it was checked numerically against the zero side of the explicit formula (first $400$ zeros).
+
+\subsection{Position side}
+Let $\gamma$ denote Euler's constant. For $g=f*\tilde f$,
+\begin{multline}\label{eq:P}
+Q_L(f)=4\int_0^{2L}g(x)\cosh\tfrac x2\,dx-g(0)\bigl(\log\pi+\gamma+\log(1-e^{-4L})\bigr)\\
++\int_0^{2L}\frac{2\,[e^{-2x}g(0)-e^{-x/2}g(x)]}{1-e^{-2x}}\,dx-2\sum_{\log n<2L}\frac{\Lambda(n)}{\sqrt n}\,g(\log n).
+\end{multline}
+\emph{Derivation.} For smooth $f$, insert $\psi(s)=-\gamma+\int_0^\infty\frac{e^{-t}-e^{-st}}{1-e^{-t}}\,dt$ into~\eqref{eq:weil} and apply Fourier inversion (Fubini applies since $g$ is smooth). For $x>2L$ only the $g(0)$ part of the integrand survives and integrates in closed form, giving the term $\log(1-e^{-4L})$; the pole term gives $4\int_0^{2L}g\cosh(x/2)$. For a polynomial $f$ on $[-L,L]$ (needed for the trial functions), $g$ is a polynomial on $[0,2L]$ and Lipschitz on~$\R$; apply~\eqref{eq:P} to the mollification $f*\phi_\epsilon$ on the window $L+\epsilon$ (no $\log n$ equals $2L$, and the $\log(1-e^{-4L})$ term absorbs the change of upper limit) and let $\epsilon\to0$: the frequency side converges by dominated convergence since $\Psi_L|F|^2=O(t^{-2}\log t)$, and on the position side $g_\epsilon\to g$ uniformly with a uniform Lipschitz constant, which dominates the integrand $\sim(g(0)-g(x))/(2x)$ near $x=0$.
+
+\subsection{The operator, parity and discreteness}
+Let $A_L$ be the self-adjoint operator associated with the closure of $Q_L$ on $C_c^\infty(-L,L)$ in $L^2(-L,L)$. By Lemma~\ref{lem:E} below, $\Psi_L(t)\ge\log(t/2\pi)-1/t-\sum_{\log n<2L}2\Lambda(n)n^{-1/2}\to\infty$, and the pole term is bounded by $C\|f\|^2$; hence the form norm controls $\int\log(2+t)|F|^2$. For functions supported in $[-L,L]$ the set where this quantity and $\|f\|$ are bounded is compact in $L^2$ (high frequencies are uniformly small, and on compact $t$-sets the $F$ are equicontinuous by Paley--Wiener). So $A_L$ has compact resolvent, in agreement with~\cite[Thm.~3.6]{CCM25}. The kernel is real, so we work with real $f$ throughout.
+
+\begin{lemma}[Parity splitting]\label{lem:parity}
+Let $(Rf)(x)=f(-x)$. Then $Q_L(Rf)=Q_L(f)$, and $Q_L(f_e+f_o)=Q_L(f_e)+Q_L(f_o)$ for $f_e$ even and $f_o$ odd. Hence $A_L=A_L^{\ev}\oplus A_L^{\od}$.
+\end{lemma}
+\begin{proof}
+$Rf$ has transform $F(-t)$, which leaves $|F(t)|$ ($t$ real) and $F(\tfrac i2)F(-\tfrac i2)$ unchanged. For the bilinear form $B$ of $Q_L$, $B(f_e,f_o)=B(Rf_e,Rf_o)=-B(f_e,f_o)$.
+\end{proof}
+
+\begin{definition}
+For each parity sector $\sigma\in\{\ev,\od\}$ let $\lambda_1^\sigma(L)\le\lambda_2^\sigma(L)\le\cdots$ be the eigenvalues of $A_L^\sigma$, counted with multiplicity; by compactness of the resolvent they coincide with the min-max values
+\[
+\lambda_k^\sigma(L)=\inf_{\substack{V\subset\mathcal D^\sigma\\ \dim V=k}}\ \sup_{0\ne f\in V}\frac{Q_L(f)}{\|f\|^2},
+\]
+where $\mathcal D^\sigma$ is the form domain of the sector. (Indices start at~$1$, as in~\cite{Zhu,Elston}; the earlier note~\cite{Botha} writes $\lambda_0,\lambda_1^{\ev},\lambda_0^{\od}$ for our $\lambda_1^\ev,\lambda_2^\ev,\lambda_1^\od$.)
+\end{definition}
+
+\begin{corollary}\label{cor:criterion}
+The lowest eigenvalue of $A_L$ is simple with even eigenfunction if and only if
+\[
+\lambda_1^\ev(L)<\min\bigl(\lambda_2^\ev(L),\lambda_1^\od(L)\bigr).
+\]
+\end{corollary}
+
+\begin{remark}\label{rem:affine}
+The property in Corollary~\ref{cor:criterion} is invariant under $Q\mapsto aQ+b\|\cdot\|^2$ with $a>0$. Conventions that differ from ours by a positive factor (e.g.\ $2\pi$) or a constant shift (e.g.\ the placement of $\log\pi$) therefore do not affect the theorem.
+\end{remark}
+
+% =====================================================================
+\section{Monotonicity and the grid argument}\label{sec:mono}
+
+\begin{lemma}[Monotonicity in $L$]\label{lem:mono}
+For $0<L<L'$, every $k\ge1$ and $\sigma\in\{\ev,\od\}$, $\lambda_k^\sigma(L')\le\lambda_k^\sigma(L)$.
+\end{lemma}
+\begin{proof}
+Extension by zero $\iota:L^2(-L,L)\to L^2(-L',L')$ is an isometry that preserves parity and maps the form domain into the form domain, and $Q_{L'}(\iota f)=Q_L(f)$: the pole and archimedean terms depend only on $F$, and a prime power with $2L\le\log n<2L'$ contributes $g(\log n)=0$ because $g$ is continuous and supported in $[-2L,2L]$ with $g(\pm2L)=0$. The min-max infimum over the larger family of subspaces of $L^2(-L',L')$ (which contains all $\iota V$) can only be smaller.
+\end{proof}
+
+\begin{corollary}[Step criterion]\label{cor:step}
+Let $L_i<L_{i+1}$, let $U(L_i)\ge\lambda_1^\ev(L_i)$, and let $\ell_2(L_{i+1})\le\lambda_2^\ev(L_{i+1})$ and $\ell^\od(L_{i+1})\le\lambda_1^\od(L_{i+1})$. If
+\begin{equation}\label{eq:step}
+\min\bigl(\ell_2(L_{i+1}),\ell^\od(L_{i+1})\bigr)>U(L_i),
+\end{equation}
+then the ground state of $A_L$ is simple and even for every $L\in[L_i,L_{i+1}]$.
+\end{corollary}
+\begin{proof}
+For such $L$, by Lemma~\ref{lem:mono},
+\[
+\lambda_1^\ev(L)\le\lambda_1^\ev(L_i)\le U(L_i)<\min(\ell_2,\ell^\od)(L_{i+1})\le\min\bigl(\lambda_2^\ev(L),\lambda_1^\od(L)\bigr);
+\]
+conclude with Corollary~\ref{cor:criterion}.
+\end{proof}
+
+We call the quotient $\min(\ell_2,\ell^\od)(L_{i+1})/U(L_i)$ the \emph{step ratio}. Prime-power entries inside a step are harmless, since Lemma~\ref{lem:mono} holds across them.
+
+% =====================================================================
+\section{Main theorem}\label{sec:main}
+
+\begin{theorem}\label{thm:main}
+For every $L\in(0,\Lmax]$ the lowest eigenvalue of the operator $A_L$ associated with Weil's quadratic form~\eqref{eq:weil} on $L^2(-L,L)$ is simple, and its eigenfunction is even. Quantitatively:
+\begin{enumerate}
+\item on $(0,0.05]$: $\lambda_2^\ev-\lambda_1^\ev\ge0.4172$ and $\lambda_1^\od-\lambda_1^\ev\ge0.6624$;
+\item on each of the $30$ grid steps $[L_i,L_{i+1}]\subset[0.05,1.19]$ of Table~\ref{tab:piece2}: step ratio $\ge1.288$;
+\item on each of the $8$ grid steps $[L_i,L_{i+1}]\subset[1.19,\Lmax]$ of Table~\ref{tab:piece3}: step ratio $\ge1.131$.
+\end{enumerate}
+\end{theorem}
+
+\begin{remark}[Status of release 1.1.0]\label{rem:status}
+Items (1) and (2) are the certificate of record of~\cite{Botha}, re-checked by the gluing script (\S\ref{sec:repro}). Item~(3) rests on the $16$ lower-bound certificates and $8$ upper bounds of Table~\ref{tab:piece3}, all complete. The goal of this work is $L\in(0,1.5]$: the extension to $1.5$ is in progress, with the even sector at $1.4255$ and both sectors at $1.468$, $1.4885$ and $1.5$ still running. The later step $[1.4255,1.447]$ already passes (Table~\ref{tab:piece3}), but it is not part of the theorem, because the step $[1.4035,1.4255]$ before it is not yet complete. At the single window $L=1.19$ the Piece~III machinery also confirms simple-even with a second, independent code path (\S\ref{sec:results3}). Piece~III beyond $L=1.19$ has not been audited (\S\ref{sec:limitations}).
+\end{remark}
+
+The numbers in (1)--(3) are outward-rounded lower ends. The proof is computer-assisted and uses Arb ball arithmetic~\cite{Johansson,FLINT}; it is given in \S\ref{sec:proof}.
+
+% =====================================================================
+\section{Proof}\label{sec:proof}
+
+\subsection{Piece I: small windows $L\in(0,0.05]$}\label{sec:piece1}
+Here $L<\tfrac12\log2$, so no prime powers occur. Put $f(x)=L^{-1/2}f_1(x/L)$ with $\|f_1\|_{L^2(-1,1)}=1$ and $F_1=\hat f_1$. The substitution $t=\tau/L$ gives
+\[
+Q_L(f)=\log\tfrac1L+R_L(f_1),\qquad R_L(f_1)=P_L(f_1)+\frac1\pi\int_0^\infty m_L(\tau)|F_1(\tau)|^2\,d\tau,
+\]
+with $m_L(\tau)=\re\psi(\tfrac14+\tfrac{i\tau}{2L})-\log\pi+\log L$, $P_L(f_1)=2L\bigl(\int_{-1}^1f_1e^{-Ls/2}ds\bigr)^2$ for even $f_1$ and $P_L(f_1)=-2L\bigl(\int_{-1}^1f_1\sinh(Ls/2)ds\bigr)^2$ for odd $f_1$. The shift $\log(1/L)$ is common to all $f_1$, so the gaps of $Q_L$ equal those of $R_L$, sector by sector, and $R_L$ acts on the fixed space $L^2(-1,1)$. With $u=\tau/(2L)$,
+\[
+\partial_Lm_L=\tfrac1L h(u),\qquad h(u)=1-\re\bigl(iu\,\psi'(\tfrac14+iu)\bigr).
+\]
+
+\begin{lemma}\label{lem:h}
+For $u>0$, $|h(u)|\le0.8125/u^2$.
+\end{lemma}
+\begin{proof}
+From $\psi'(w)=\sum_{n\ge0}(n+w)^{-2}$ one gets $h(u)=1-\sum_{n\ge0}\varphi(n+\tfrac14)$ with $\varphi(a)=2au^2/(a^2+u^2)^2$ and $\int_0^\infty\varphi=1$. The sum is the midpoint rule for $\int_{-1/4}^\infty\varphi$ with unit cells. The midpoint Peano kernel is bounded by $1/8$ and $\int_\R|\varphi''|=6/u^2$, so the quadrature error is at most $\tfrac34u^{-2}$; and $|\int_{-1/4}^0\varphi|\le\int_{-1/4}^02|a|u^{-2}da=\tfrac1{16}u^{-2}$.
+\end{proof}
+
+We bound $\int_0^\infty|h|$ by an upper Riemann sum on $[0,40]$ with cells of width $1/200$, enclosing $\sup|h|$ on each cell by evaluating $h$ on a ball covering the cell, plus $0.8125/40$ from Lemma~\ref{lem:h}. At $768$ bits this gives $\int|h|\le0.593979$. Since $|F_1|^2\le(\int|f_1|)^2\le2$, the multiplier part of $\frac{d}{dL}R_L(f_1)$ is at most $\frac4\pi\int|h|$. For the even pole term, with $J=\int f_1e^{-Ls/2}$, $\frac{d}{dL}(2LJ^2)=2J^2+4LJJ'$ and Cauchy--Schwarz gives $J^2\le2\sinh L/L$, $|J'|\le\tfrac12(\tfrac23e^L)^{1/2}$; for the odd pole term, with $K=\int f_1\sinh(Ls/2)$, $K^2\le2\sinh^2(L/2)$ and $|K'|\le\tfrac12\cosh(L/2)\sqrt{2/3}$. All bounds increase in $L$; evaluated at $L_0=0.05$ they give, uniformly for $L\le L_0$,
+\[
+C_\ev=\tfrac4\pi\textstyle\int|h|+2J^2+4L_0|J||J'|\le4.876362,\qquad C_\od\le0.761666.
+\]
+The forms $R_L$ share the core $C_c^\infty(-1,1)$ and $|R_L(f_1)-R_{L'}(f_1)|\le C_\sigma|L-L'|\|f_1\|^2$ in sector $\sigma$; by min-max every sector eigenvalue of $R_L$ is $C_\sigma$-Lipschitz in $L$. With the certified values $\ell_1,U,\ell_2,\ell^\od$ at $L_0=0.05$ (Table~\ref{tab:piece2}), for $L\le L_0$,
+\begin{gather*}
+\lambda_2^\ev(L)-\lambda_1^\ev(L)\ge\ell_2-U-2C_\ev L_0\ge0.4172,\\
+\lambda_1^\od(L)-\lambda_1^\ev(L)\ge\ell^\od-U-(C_\ev+C_\od)L_0\ge0.6624.
+\end{gather*}
+Both are positive, which proves item~(1) of Theorem~\ref{thm:main}. \qed
+
+\begin{remark}
+At $53$ bits the same procedure gives the smaller enclosures $\int|h|\le0.592773$, $C_\ev\le4.87484$, $C_\od\le0.760130$; at $128$ bits $\int|h|\le0.593583$. All are upper bounds under Arb's containment guarantee and we use the largest. Why the higher-precision upper end is larger is not explained (\S\ref{sec:limitations}).
+\end{remark}
+
+\subsection{Per-window certificates on $[0.05,1.19]$}\label{sec:piece2cert}
+Fix $L$ and a parity. We use the orthonormal Legendre basis $e_n(x)=c_nP_n(x/L)$, $c_n=\sqrt{(2n+1)/(2L)}$, with $n=2m$ (even) or $n=2m+1$ (odd). Up to a unit factor common to the sector, $\hat e_n(t)=c_n\,2L\,(-1)^mj_n(Lt)$ with $j_n$ the spherical Bessel function, and the pole vector is $p_m=\sqrt2\,c_n\,2L\,i_n(L/2)$, so that $[\pole]=\pm(p\cdot a)^2$ for $f=\sum a_me_{n(m)}$.
+
+\begin{lemma}[Binet bound]\label{lem:B}
+For $\re w>0$, $\bigl|\psi(w)-\log w+\tfrac1{2w}\bigr|\le\dfrac1{12|w|\re w}$.
+\end{lemma}
+\begin{proof}
+Binet's formula reads $\psi(w)=\log w-\frac1{2w}-\int_0^\infty b(x)e^{-wx}dx$ with $b(x)=\frac1{e^x-1}-\frac1x+\frac12$, $b(0)=0$. With $y=x/2$, $b'(x)=\tfrac14(y^{-2}-\sinh^{-2}y)\ge0$. For $y<\sqrt3$ the inequality $b'\le\tfrac1{12}$ reduces to $\sinh^2y\le3y^2/(3-y^2)$, which holds coefficientwise ($2^{2k-1}/(2k)!\le3^{1-k}$, with equality at $k=1,2$ and term ratio $4/((2k+1)(2k+2))\le\tfrac13$); for $y\ge\sqrt3$ it is trivial. Integrating by parts, $\int be^{-wx}=w^{-1}\int b'e^{-wx}$, of modulus at most $1/(12|w|\re w)$.
+\end{proof}
+
+\begin{lemma}[Envelope; {[Zhu, Lemma 3.1]}]\label{lem:E}
+For $w=\tfrac14+\tfrac{it}2$ and $t\ge3/2$, $\re\psi(w)\ge\log\tfrac t2-\tfrac2{3t}-\tfrac1{2t^2}\ge\log\tfrac t2-\tfrac1t$.
+\end{lemma}
+\begin{proof}
+Lemma~\ref{lem:B} with $|w|\ge t/2$ and $\re(1/(2w))\le1/(2t^2)$; the second inequality is equivalent to $t\ge3/2$.
+\end{proof}
+
+Let $A_L^{\sup}=\sum_{\log n<2L}2\Lambda(n)/\sqrt n$. The prime comb is $\ge-A_L^{\sup}$ and the envelope increases in $t$, so for $t\ge\Tsh$
+\begin{equation}\label{eq:beta}
+\Psi_L(t)\ge\beta:=\log\frac{\Tsh}{2\pi}-\frac1{\Tsh}-A_L^{\sup}.
+\end{equation}
+
+\begin{lemma}[Frequency reduction; {[Zhu, Thm.~1.1]}]\label{lem:R}
+Assume $\Psi_L\ge\beta>0$ on $[\Tsh,\infty)$ and let $\mathcal R(f)=[\pole]+\frac1\pi\int_0^{\Tsh}(\Psi_L-\beta)|F|^2dt+\beta\|f\|^2$. Then $Q_L\ge\mathcal R$ as forms, hence $\lambda_k^\sigma(Q_L)\ge\lambda_k^\sigma(\mathcal R)$ for all $k$ and $\sigma$.
+\end{lemma}
+\begin{proof}
+Write $\Psi_L=(\Psi_L-\beta)+\beta$, use $\frac1\pi\int_0^\infty|F|^2=\|f\|^2$, drop the nonnegative integral over $[\Tsh,\infty)$ and apply min-max.
+\end{proof}
+
+\begin{lemma}[Monotonicity of $\re\psi$]\label{lem:M}
+For $s>0$, $\re\psi(s+iy)=\psi(s)+\sum_{n\ge0}\frac{y^2}{(n+s)((n+s)^2+y^2)}$ is increasing in $|y|$. Consequently $|\Psi_L-\beta|\le M_\psi:=\max(|\re\psi(\tfrac14)|,|\re\psi(\tfrac14+\tfrac{i\Tsh}2)|)+\log\pi+A_L^{\sup}+\beta$ on $[0,\Tsh]$.
+\end{lemma}
+\begin{proof}
+Take real parts in $\psi(w)=-\gamma+\sum_n\bigl(\frac1{n+1}-\frac1{n+w}\bigr)$.
+\end{proof}
+
+\begin{lemma}[Bessel bounds]\label{lem:J}
+$|j_n(x)|\le\dfrac{x^n}{(2n+1)!!}$ and $0\le i_n(x)\le\dfrac{x^n}{(2n+1)!!}e^{x^2/2}$ for $x\ge0$.
+\end{lemma}
+\begin{proof}
+Use Poisson's integral and the beta integral,
+\[
+j_n(x)=\frac{x^n}{2^{n+1}n!}\int_{-1}^1\cos(xs)(1-s^2)^n\,ds,\qquad\int_{-1}^1(1-s^2)^n\,ds=\frac{2^{2n+1}(n!)^2}{(2n+1)!};
+\]
+for $i_n$ replace $\cos$ by $\cosh\le e^{x^2/2}$.
+\end{proof}
+
+\begin{lemma}[Gauss--Legendre and Bernstein; {\cite[Thm.~19.3]{Trefethen}}]\label{lem:G}
+If $g$ is analytic in the Bernstein ellipse $E_\rho$ with $|g|\le M$ there, then the $n$-point Gauss--Legendre rule on $[-1,1]$ has error at most $\frac{64}{15}M\rho^{-2n+2}/(\rho^2-1)$. A polynomial of degree $d$ bounded by $M$ on $[-1,1]$ is bounded by $M\rho^d$ on $E_\rho$.
+\end{lemma}
+\noindent The cited theorem is stated with $\rho^{-2n}$ for the $(n+1)$-point rule; the form above is the same statement for $n$ points.
+
+\begin{remark}[Correction of a Gauss--Legendre constant]\label{rem:erratum}
+The original runs of the window certificates applied $\rho^{-2n}$ to the $n$-point rule, so quadrature balls were too small by $\rho^2$ (about $4.33$ for the head panels, $9$ for the Rayleigh outer rule). The error was found in internal review and fixed in the code. The original certificate was first corrected by a Weyl shift of every lower bound by $\delta=N(\rho^2-1)q_{\mathrm{old}}$ ($\delta\le6.4\e{-35}$ for $L\le0.8$, $\le1.6\e{-33}$ for $0.84\le L\le0.97$, $\le3.2\e{-32}$ for $0.98\le L\le1$) and fresh upper bounds; that correction assumed unchanged window parameters between code revisions. It has since been superseded by a clean end-to-end rerun with the corrected code, which is the certificate of record used here and does not depend on the correction.
+\end{remark}
+
+\emph{Head matrix.} We compute $C_{jk}=\frac1\pi\int_0^{\Tsh}(\Psi_L-\beta)\hat e_j\hat e_k\,dt$ by $64$-point Gauss--Legendre on each unit panel in Arb. The ellipse has half-height $B=2/5$, $\rho=2B+\sqrt{4B^2+1}$. For complex $t$ the continuation of $\re\psi(\tfrac14+\tfrac{it}2)$ is $\tfrac12(\psi(w_+)+\psi(w_-))$, $w_\pm=\tfrac14\pm\tfrac{it}2$; on the strip $\re w_\pm\ge\tfrac14-\tfrac B2=0.05$, and Lemma~\ref{lem:B} bounds $\psi(w_\pm)$. On the strip $|\hat e_j|\le\sqrt{2L}e^{LB}$ and the comb is bounded by $\sum2\Lambda(n)n^{-1/2}\cosh(B\log n)$. The per-entry error is $\Tsh\cdot\frac{32}{15}M\rho^{-126}/(\rho^2-1)$ and is added as a ball. The head is $A=C\pm pp^T+\beta I+(\text{quadrature ball})$, with $+$ in the even and $-$ in the odd sector.
+
+\emph{Tails.} For tail orders $n\ge n_0$ put $X=L\Tsh$; then $|\hat e_n|\le\sigma_n:=c_n2LX^n/(2n+1)!!$ on $[0,\Tsh]$ and $\sigma_{n+2}/\sigma_n\le r=\sqrt{\frac{2n_0+5}{2n_0+1}}\frac{X^2}{(2n_0+3)(2n_0+5)}<1$ (asserted), so $\sum\sigma^2\le\sigma_{n_0}^2/(1-r^2)$. The tail of the pole vector satisfies $\|p_{\mathrm{tail}}\|\le p_{\mathrm{tail}}:=\sqrt2c_{n_0}2Ly^{n_0}/(2n_0+1)!!\cdot e^{y^2/2}/\sqrt{1-y^2}$, $y=L/2$. Put
+\[
+e_D=\frac{M_\psi}\pi\Tsh\sum\sigma^2+[\od]\,p_{\mathrm{tail}}^2,\qquad
+e_B=\frac{M_\psi}\pi\Tsh\sqrt{2L}\sqrt N\Bigl(\sum\sigma^2\Bigr)^{1/2}+2\|p_{\mathrm{head}}\|p_{\mathrm{tail}}.
+\]
+Then the tail block satisfies $D\ge(\beta-e_D)I$ (in the even sector the tail pole term $+pp^T\ge0$ is dropped) and the coupling block satisfies $\|X\|\le e_B$ by Hilbert--Schmidt bounds.
+
+\begin{lemma}[Block bound; {[Zhu, Thm.~1.1, \S6.2]}]\label{lem:S}
+Let $\mathcal R=\begin{pmatrix}A&X\\X^T&D\end{pmatrix}$ with $D\ge(\beta-e_D)I$ and $\|X\|\le e_B$. Then $\lambda_k(\mathcal R)\ge\min(\lambda_k(A),\beta-e_D)-e_B$ for every $k$.
+\end{lemma}
+\begin{proof}
+$\bigl\|\begin{pmatrix}0&X\\X^T&0\end{pmatrix}\bigr\|=\|X\|$, so $\mathcal R\ge\operatorname{diag}(A,D)-e_B$. The $k$-th min-max value of $\operatorname{diag}(A,D)$ is at least $\min(\lambda_k(A),\lambda_1(D))$; conclude with Weyl's inequality.
+\end{proof}
+
+\emph{Verified Cholesky.} To show $A-\mu I\succeq0$ for a ball matrix $A$, set $d=\mu/100$, compute an approximate Cholesky factor $R$ of $\operatorname{mid}(A)-(\mu+d)I$ in midpoint arithmetic, compute $E=A-(\mu+d)I-RR^T$ rigorously in ball arithmetic, and check $\|E\|_F<d$; then $A-\mu I=RR^T+E+dI\succeq0$ for every matrix in the ball (cf.~\cite{Rump}). Eigenvalue estimates from inverse iteration on midpoints are used only to choose $\mu$ and the deflation vector and carry no rigour. With Lemmas~\ref{lem:R} and~\ref{lem:S} this gives $\lambda_1^\ev\ge\min(\mu_1,\beta-e_D)-e_B$, $\lambda_1^\od\ge\min(\mu^\od,\beta-e_D^\od)-e_B^\od$, and $\lambda_2^\ev\ge\min(\mu_2,\beta-e_D)-e_B$ where $\mu_2$ is certified for $A+vv^T$ (Lemma~\ref{lem:deflation} below).
+
+\emph{Parameters.} The cutoff is $\Tsh=\max(200,5\lceil80/(5L)\rceil,5\lceil2\pi e^{A_L^{\sup}+1/2}/5\rceil)$ and the head has $N=\lceil eL\Tsh/4\rceil+42$ modes per sector. For $L>1$ (``sharp cutoff'') we use instead $\Tsh=2450$ ($L=1.03$), $4000$ ($L=1.06,1.09$), $5550$ ($L=1.12$--$1.19$), the exact dyadic floor $\beta=3/16$, $112$ Gauss nodes per unit panel and $N=\lceil eL\Tsh/4\rceil+80$. Lemma~\ref{lem:E} is applied above the crude cutoff $T_2$ (asserting $\log(T_2/2\pi)-1/T_2-A_L^{\sup}\ge3/16$), and $\Psi_L>\beta$ on $[\Tsh,T_2]$ is certified by Arb enclosures of $\Psi_L$ on cells of width $0.01$ with bisection (minimum width $10^{-9}$). Together $\Psi_L\ge\beta$ on $[\Tsh,\infty)$, which is all Lemma~\ref{lem:R} needs. This device is a refinement inside Zhu's reduction; we make no novelty claim for it. Validation at $L=1$: the sharp path gives $4.978\e{-30}\le\lambda_1^\ev\le9.406\e{-30}$, $\lambda_2^\ev\ge1.808\e{-23}$, $\lambda_1^\od\ge1.255\e{-26}$, overlapping the crude-cutoff values of Table~\ref{tab:piece2}.
+
+\emph{Spherical Bessel values for $L\ge0.98$.} Orders $n\le n_1=\lfloor x\rfloor$ use upward recurrence in ball arithmetic from Arb seeds every $400$ orders; orders $n>n_1$ use the ratios $r_k=j_k/j_{k-1}$ from the backward continued fraction $r_k=x/(2k+1-xr_{k+1})$, started from $[0,1]$ and anchored at $j_{n_1}$.
+
+\begin{lemma}[Ratio enclosure]
+For $x>0$ and $k\ge\lfloor x\rfloor+1$, every true ratio $r_k$ lies in $(0,1]$; hence the interval iteration started from $[0,1]$ encloses it.
+\end{lemma}
+\begin{proof}
+If $2k+1\ge2x$, the map $\tau\mapsto x/(2k+1-x\tau)$ sends $[0,1]$ into $[x/(2k+1),x/(2k+1-x)]\subset[0,1]$. By downward induction from large $K$ (where $j_K(x)>0$ and $r_K\in[0,1]$): if $2k+1\ge2x$ and $r_{k+1}\in[0,1]$, then $j_{k-1}/j_k=(2k+1)/x-r_{k+1}\ge1$, so $r_k\in(0,1]$ and $j_{k-1}>0$. The condition holds for all $k\ge\lfloor x\rfloor+1$.
+\end{proof}
+The enclosures need not be sharp at the top orders unless the start index is well above $n_{\max}$~\cite{Gautschi}; sharpness only affects the size of the radii.
+
+\emph{Upper bound $U$.} The trial function is $f=\sum_{m<m^*}v_me_{2m}$, a polynomial on $[-L,L]$, with $v$ an approximate ground vector (exact dyadic entries). In $s=x/L$, $g(Ls)=L\int_{-1}^{1-s}f(y)f(y+s)dy$ is computed exactly by $(D+1)$-point Gauss--Legendre ($D=\deg f$); the integral in~\eqref{eq:P} by $450$-point Gauss--Legendre on $[0,2]$ with error bounded by Lemma~\ref{lem:G} ($\rho=3$, exponent $\rho^{-898}$, ellipse maximum enclosed by $2048$ ball arcs with $|1-e^{-2Lz}|>0$ asserted on each arc; the zeros $i\pi k/L$, $k\neq0$, lie outside the ellipse); the other terms of~\eqref{eq:P} exactly. Then $U\ge Q_L(f)/\|f\|^2\ge\lambda_1^\ev(L)$. A polynomial on $[-L,L]$ has $|\hat f|^2=O(t^{-2})$ and lies in the form domain $\{f:\int\log(2+t)|\hat f|^2<\infty\}$, and in the closure of $C_c^\infty(-L,L)$ there, since the weight is weaker than any $H^s$, $s<\tfrac12$.
+
+\subsection{Piece II: the grid on $[0.05,1.19]$}\label{sec:piece2}
+The grid is
+\begin{gather*}
+0.05,\ 0.1,\ 0.2,\ 0.3,\ 0.35,\ 0.4,\ 0.45,\ 0.5,\ 0.55,\ 0.6,\ 0.64,\ 0.68,\ 0.72,\ 0.76,\ 0.8,\ 0.84,\\
+0.87,\ 0.9,\ 0.93,\ 0.96,\ 0.97,\ 0.98,\ 0.99,\ 1.0,\ 1.03,\ 1.06,\ 1.09,\ 1.12,\ 1.15,\ 1.18,\ 1.19.
+\end{gather*}
+For each of the $30$ steps the criterion~\eqref{eq:step} holds (Table~\ref{tab:piece2}); the smallest ratios are $1.288$ on $[0.05,0.1]$, $1.320$ on $[0.1,0.2]$ and, past $L=1$, $2.148$ on $[1.15,1.18]$. By Corollary~\ref{cor:step} this proves item~(2) of Theorem~\ref{thm:main}. \qed
+
+\begin{remark}[Comparisons and dyadic windows]
+(a) The gluing script compares balls with Python's built-in \texttt{min}, which is not a rigorous minimum when balls overlap; here the two lower bounds are disjoint at every window (relative separation $\ge1.021$, radii $<5\e{-20}$), and the step ratios in Table~\ref{tab:piece2} were recomputed with explicit endpoint comparisons. (b) Each window is certified at the dyadic number $\tilde L_i\ge L_i$ with $\tilde L_i<L_i+2^{-p}$, $p\ge768$, for all four bounds of the window; the covering is then $(0,\tilde L_1]\cup\bigcup_i[\tilde L_i,\tilde L_{i+1}]\supset(0,1.19]$.
+\end{remark}
+
+\subsection{Piece III: the grid on $(1.19,\Lmax]$}\label{sec:piece3}
+Beyond $L\approx1.2$ the route of \S\ref{sec:piece2cert} is impractical: the cutoff $\Tsh\gtrsim2\pi e^{A_L^{\sup}}$ forced by the pointwise bound~\eqref{eq:beta} is about $2\cdot10^5$ at $L=1.3$ and $5\cdot10^6$ at $L=1.5$, and Zhu [Lemma 3.2] shows that $A_L^{\sup}$ is optimal for any pointwise bound. Elston~\cite{Elston} replaces the pointwise bound by an operator bound for the prime comb on a slightly widened window. We state his reduction as a cited proposition; we use his code unchanged except for the deflation option described below.
+
+\emph{Notation.} Let $a=L$ be the window, $\delta>0$, $b=a+\delta$, $\beta_K>0$, and $\Tsh>\beta_K/\delta$ with $\Omega:=\Tsh-\beta_K/\delta$ and $\Omega\delta\ge1$. Let $W(u)=I_0(\beta_K\sqrt{1-u^2/\delta^2})/I_0(\beta_K)$ on $[-\delta,\delta]$ (Kaiser window, $0$ outside), $\kappa(u)=\frac{\sin\Omega u}{\pi u}W(u)$ and $m=1-\hat\kappa$. Let $H(t)=\re\psi(\tfrac14+\tfrac{it}2)-\log\pi$, $P(t)=\sum_{\log n<2a}\frac{2\Lambda(n)}{\sqrt n}\cos(t\log n)$, so $\Psi_a=H-P$, and $A=\sum_{\log n<2a}2\Lambda(n)/\sqrt n$. Let $C_b=\sum_{\log n<2a}\Lambda(n)n^{-1/2}(\tau_{\log n}+\tau_{-\log n})$, compressed to $L^2(-b,b)$, where $\tau_s$ is translation by~$s$.
+
+\begin{proposition}[Elston~\cite{Elston}]\label{prop:elston}
+Assume
+\begin{enumerate}
+\item[(H1)] $\bar\mu\ge\sup\{\langle h,C_bh\rangle/\|h\|^2:0\ne h\in L^2(-b,b)\}$;
+\item[(H2)] $\eps\ge\sup_{t\ge\Tsh}|\hat\kappa(t)|$ (in~\cite{Elston}, $\eps=2/(\pi\beta_KI_0(\beta_K))$);
+\item[(H3)] $0<\beta'\le\log\frac{\Tsh}{2\pi}-\frac1{\Tsh}-\bar\mu-(2\eps+\eps^2)(A+\bar\mu)$.
+\end{enumerate}
+Put $\Phi=\Psi_a+m^2(P-\bar\mu)$ and
+\[
+R'(f)=[\pole]+\frac1\pi\int_0^{\Tsh}(\Phi-\beta')|F|^2\,dt+\beta'\|f\|^2.
+\]
+Then:
+\begin{enumerate}
+\item[(a)] $Q_a\ge R'$ as forms on each parity sector.
+\item[(b)] Let $A_N$ be the matrix of $R'$ on the first $N$ Legendre modes of the sector, and let $\eps_D,\eps_B$ be the tail constants of Zhu's reduction computed with $G\ge\sup_{[0,\Tsh]}|\Phi-\beta'|$ (Bessel tail bounds as in Lemma~\ref{lem:J}; $\eps_D$ by a Gershgorin bound on the tail rows, $\eps_B$ by a Schur test). Then the tail block of $R'$ is $\succeq(\beta'-\eps_D)I$ and the coupling block has norm $\le\eps_B$.
+\item[(c)] The certifier encloses every entry of $A_N$ in a ball (Gauss--Legendre nodes and weights, $\Psi$ via the complex digamma function, $m$ by rigorous integration of the Kaiser main lobe and a mean-value bound for the side lobes, $j_n$ by recurrence and ratio enclosure), adds a spectral quadrature debit $c_{\mathrm{err}}$ from a Bernstein-ellipse bound on panels of width $1/4$, and certifies a lower bound $\lambda_1(A_N)\ge\mu'-\rho_{\mathrm{res}}-N r_{\max}-c_{\mathrm{err}}$, where $\mu'$ is a dyadic shift, $\rho_{\mathrm{res}}$ the $\infty$-norm of an exactly computed integer Cholesky residual divided by the scale $2^{2P}$ (plus $N2^{-2P}$ for the floors), and $r_{\max}$ the largest entry radius.
+\end{enumerate}
+\end{proposition}
+\begin{proof}[Proof of (a), following~\cite{Elston}]
+Put $h=f-f*\kappa$; then $\operatorname{supp}h\subset[-b,b]$ and $\hat h=mF$. By (H1), $\frac1\pi\int_0^\infty Pm^2|F|^2=\langle h,C_bh\rangle\le\bar\mu\|h\|^2=\frac1\pi\int_0^\infty\bar\mu m^2|F|^2$, so $\frac1\pi\int m^2(\bar\mu-P)|F|^2\ge0$ and $Q_a(f)\ge[\pole]+\frac1\pi\int_0^\infty\Phi|F|^2$. For $t\ge\Tsh$, $\Phi=H-\bar\mu-(1-m^2)(P+\bar\mu)$ with $|1-m^2|\le2\eps+\eps^2$ by (H2), so Lemma~\ref{lem:E} and (H3) give $\Phi\ge\beta'$; dropping $\frac1\pi\int_{\Tsh}^\infty(\Phi-\beta')|F|^2\ge0$ gives $Q_a\ge R'$.
+\end{proof}
+Elston states (b)--(c) for the lowest eigenvalue; in~\cite{Elston}, $\bar\mu$ is certified by a weighted Schur test on $4000$--$8000$ cells with a Collatz--Wielandt weight, and the finite certificate is an exact integer Gram residual in the spirit of~\cite{Rump}. An independent audit of the code at $L=1.19$ (documented in~\cite{Elston}) found and fixed two implementation issues; the code used here is the post-audit version (upstream commit \file{3cc4cb7b}).
+
+\begin{lemma}[Rank-one deflation]\label{lem:deflation}
+Let $A$ be a real symmetric $N\times N$ matrix and $w\in\R^N$. Then $\lambda_2(A)\ge\lambda_1(A+ww^T)$. In particular, if $A+ww^T-\mu I\succeq0$ then $A$ has at most one eigenvalue below $\mu$.
+\end{lemma}
+\begin{proof}
+By Courant--Fischer, $\lambda_2(A)=\max_{y\ne0}\min\{x^TAx:\|x\|=1,\,x\perp y\}\ge\min\{x^TAx:\|x\|=1,\,x\perp w\}=\min\{x^T(A+ww^T)x:\|x\|=1,\,x\perp w\}\ge\lambda_1(A+ww^T)$. (For $w=0$ the claim is trivial.)
+\end{proof}
+
+\begin{corollary}[Second even eigenvalue]\label{cor:lambda2}
+Under the hypotheses of Proposition~\ref{prop:elston}, in the even sector and for any $w\in\R^N$,
+\[
+\lambda_2^\ev(L)\ \ge\ \lambda_2(R'^{\,\ev})\ \ge\ \min\bigl(\lambda_1(A_N+ww^T),\ \beta'-\eps_D\bigr)-\eps_B .
+\]
+\end{corollary}
+\begin{proof}
+By Lemma~\ref{lem:deflation}, $\lambda_2(A_N)\ge\lambda_1(A_N+ww^T)$. Lemma~\ref{lem:S} with $k=2$ (Weyl's inequality applied to the off-diagonal blocks, with the bounds of Proposition~\ref{prop:elston}(b)) gives $\lambda_2(R')\ge\min(\lambda_2(A_N),\beta'-\eps_D)-\eps_B$. Since $Q_L\ge R'$ as forms (Proposition~\ref{prop:elston}(a)), min-max gives $\lambda_2^\ev(L)\ge\lambda_2(R'^{\,\ev})$.
+\end{proof}
+
+\emph{Implementation of the deflation} (option \texttt{--deflate}; our only change to~\cite{Elston}). After the ball matrix $A_N$ is assembled, a vector $v$ approximating the unit lowest eigenvector of $\operatorname{mid}(A_N)$ is computed by $12$ steps of inverse iteration; its entries are rounded to $20$ significant decimal digits and converted to Arb balls. The matrix $A_N+vv^T$ is formed in ball arithmetic, so it encloses $A_N+ww^T$ for the exact midpoint vector $w$ of $v$, and the rounding of $v$ enters the largest entry radius $r_{\max}$ exactly like the Gram radii. The certifier then runs unchanged on $A_N+vv^T$, and Proposition~\ref{prop:elston}(c) yields a certified lower bound for $\lambda_1(A_N+ww^T)$. The choice of $v$ affects only sharpness, not rigour.
+
+\emph{One form, two codes.} The step test~\eqref{eq:step} compares lower bounds from Elston's certifier with upper bounds from our code, so both must refer to the same form with the same norm. Both implement~\eqref{eq:weil} in Zhu's normalisation ($\|f\|^2=\frac1\pi\int_0^\infty|F|^2$ for real $f$, pole term $+2F(\tfrac i2)^2$ in the even and $-2|F(\tfrac i2)|^2$ in the odd sector). As a consistency check, at $L=1.19$ Elston's certified even lower bound $6.8131\e{-48}$, our Piece~II bracket $[7.8\e{-48},1.312\e{-47}]$ and the Legendre--Galerkin value $8.676\e{-48}$ of \S\ref{sec:upper} are mutually compatible; in the odd sector Elston's certified lower bound $3.9197\e{-44}$ lies below our rigorous Galerkin upper bound $4.8461\e{-44}$ ($K=256$). The proof does not rely on these numerical agreements; it relies only on both codes evaluating~\eqref{eq:weil}.
+
+\emph{Upper bounds $U(L_i)$.} At every grid point $L_i$, including $L_i=1.19$, $U(L_i)$ is the outward-rounded upper endpoint of a Rayleigh quotient $v^TQ_Kv/v^Tv$ of the even Legendre--Galerkin matrix $Q_K$ ($K=640$ even modes, $3000$ bits) with an exact dyadic vector~$v$, computed in ball arithmetic with the rigorous quadrature bound of \S\ref{sec:upper} (Proposition~\ref{prop:upper}). At $L=1.19$ this gives $U(1.19)\le8.712\e{-48}$, sharper than the $1.312\e{-47}$ of Piece~II (Table~\ref{tab:piece2}). The sharper value is needed: with $1.312\e{-47}$ the first step ratio would be $0.93$. Both are valid upper bounds, and the gluing script uses the smaller one at each window.
+
+\emph{Grid.} The planned grid to $L=1.5$ is
+\begin{gather*}
+1.19,\ 1.2205,\ 1.25,\ 1.2785,\ 1.3055,\ 1.3315,\ 1.3565,\\
+1.3805,\ 1.4035,\ 1.4255,\ 1.447,\ 1.468,\ 1.4885,\ 1.5 .
+\end{gather*}
+It was chosen from non-rigorous Galerkin estimates so that $0.95\min(\lambda_2^\ev,\lambda_1^\od)(L_{i+1})\ge1.25\cdot1.03\cdot\lambda_1^\ev(L_i)$. In this release the windows $1.2205,\dots,\Lmax$ are complete in both sectors, as are the odd sector at $1.4255$ and both sectors at $1.447$; the other runs are in progress. The parameters actually used are in Table~\ref{tab:grid3} and in the field \texttt{args} of every certificate file. They follow a design rule (\file{code/gap/params.py}) that plays no role in the proof: $\Omega=\Tsh-\beta_K/\delta$ is interpolated log-linearly from Elston's runs at $L=1.19,1.3,1.495$ and inflated by $3\%$; $N\approx0.8L(\Omega+64/\delta)+20$; the number of Gauss points per panel is raised so that the quadrature debit is at most $10^{-3}$ times the target eigenvalue (computed in the certifier's plan mode); and $\beta_K$ is the smallest value for which $N$ times the side-lobe entry radius stays below $10^{-6}$ times the target eigenvalue. The last rule was added after a first pass with $\beta_K=64$ at every window gave a negative odd bound at $1.2785$; the runs from that pass that gave useful bounds ($1.2205$, $1.25$, and the even sector at $1.2785$) are kept. Grid values are passed to the certifier as decimal strings, converted to Arb balls that contain the exact decimal; the Schur window $b$ is rounded up, which is admissible because the supremum in (H1) is monotone in~$b$.
+
+\emph{Conclusion of Piece III.} Each of the $8$ steps from $1.19$ to $\Lmax$ satisfies~\eqref{eq:step} (Table~\ref{tab:piece3}); the smallest ratio is $1.131$, on $[1.2205,1.25]$, and the odd sector binds at every window. By Corollary~\ref{cor:step} this proves item~(3) of Theorem~\ref{thm:main}. \qed
+
+The step $[1.4255,1.447]$ also satisfies~\eqref{eq:step} (ratio $\ge1.379$), so the ground state is simple and even on that interval too. We report it as a data point and not as part of Theorem~\ref{thm:main}, since $[1.4035,1.4255]$ is not yet covered. Nothing is claimed for $L\in(\Lmax,1.4255)$ or $L>1.447$.
+
+% =====================================================================
+\section{Results}\label{sec:results}
+
+\subsection{Pieces I and II}
+Table~\ref{tab:piece2} lists the certificate of record on $[0.05,1.19]$. Lower bounds are rounded down and upper bounds up, to four significant digits; the step ratio in row $L_{i+1}$ is $\min(\ell_2,\ell^\od)(L_{i+1})/U(L_i)$, lower end floored. The odd sector binds at every window from $L=0.1$ on. Piece~I on this certificate: $\lambda_2^\ev-\lambda_1^\ev\ge0.4172$ and $\lambda_1^\od-\lambda_1^\ev\ge0.6624$ on $(0,0.05]$.
+
+\begin{table}[ht]
+\centering\footnotesize
+\caption{Certificate of record on $[0.05,1.19]$. $\Tsh$ and $N$ are the cutoff and the head size per sector. At $L=1$ the crude cutoff is used (the sharp-path validation is in \S\ref{sec:piece2cert}).}\label{tab:piece2}
+\begin{tabular}{rrrllllr}
+\toprule
+$L$ & $\Tsh$ & $N$ & $\lambda_1^\ev\ge$ & $\lambda_1^\ev\le U$ & $\lambda_2^\ev\ge$ & $\lambda_1^\od\ge$ & step ratio $\ge$\\
+\midrule
+0.05 & 1600 & 97 & 0.9351 & 0.9827 & 1.887 & 1.926 & (Piece I)\\
+0.1 & 800 & 97 & 0.4348 & 0.4572 & 1.387 & 1.266 & 1.288\\
+0.2 & 400 & 97 & 0.09014 & 0.09499 & 1.046 & 0.6037 & 1.320\\
+0.3 & 270 & 98 & 7.143e-3 & 7.587e-3 & 0.7437 & 0.2110 & 2.222\\
+0.35 & 230 & 97 & 1.110e-3 & 1.204e-3 & 0.6153 & 0.06086 & 8.022\\
+0.4 & 200 & 97 & 1.662e-4 & 1.841e-4 & 0.2866 & 0.01361 & 11.31\\
+0.45 & 200 & 104 & 1.465e-5 & 1.647e-5 & 0.08888 & 2.205e-3 & 11.98\\
+0.5 & 200 & 110 & 8.482e-7 & 9.506e-7 & 0.01650 & 1.752e-4 & 10.63\\
+0.55 & 200 & 117 & 4.424e-8 & 6.066e-8 & 1.234e-3 & 1.213e-5 & 12.76\\
+0.6 & 200 & 124 & 1.321e-9 & 1.813e-9 & 8.661e-5 & 4.921e-7 & 8.114\\
+0.64 & 200 & 129 & 7.330e-11 & 1.036e-10 & 5.914e-6 & 3.008e-8 & 16.59\\
+0.68 & 200 & 135 & 1.984e-12 & 2.832e-12 & 3.870e-7 & 1.180e-9 & 11.39\\
+0.72 & 200 & 140 & 5.422e-14 & 1.207e-13 & 1.013e-8 & 3.167e-11 & 11.18\\
+0.76 & 200 & 146 & 7.533e-16 & 1.802e-15 & 3.574e-10 & 7.456e-13 & 6.181\\
+0.8 & 200 & 151 & 9.787e-18 & 3.681e-17 & 4.895e-12 & 1.086e-14 & 6.031\\
+0.84 & 830 & 516 & 1.134e-19 & 1.757e-19 & 8.754e-14 & 1.322e-16 & 3.593\\
+0.87 & 830 & 533 & 2.636e-21 & 4.329e-21 & 2.568e-15 & 3.892e-18 & 22.15\\
+0.9 & 830 & 550 & 3.401e-23 & 5.545e-23 & 5.866e-17 & 5.819e-20 & 13.44\\
+0.93 & 830 & 567 & 4.303e-25 & 7.594e-25 & 8.697e-19 & 9.536e-22 & 17.20\\
+0.96 & 830 & 584 & 4.510e-27 & 7.555e-27 & 9.996e-21 & 8.439e-24 & 11.11\\
+0.97 & 830 & 590 & 8.936e-28 & 1.613e-27 & 2.109e-21 & 1.929e-24 & 255.3\\
+0.98 & 3610 & 2447 & 1.682e-28 & 2.165e-28 & 5.262e-22 & 4.471e-25 & 277.2\\
+0.99 & 3610 & 2471 & 2.782e-29 & 3.552e-29 & 1.101e-22 & 7.684e-26 & 354.9\\
+1.0 & 3610 & 2496 & 4.531e-30 & 6.601e-30 & 1.649e-23 & 1.141e-26 & 321.5\\
+1.03 & 2450 & 1795 & 2.096e-32 & 4.110e-32 & 1.055e-25 & 6.604e-29 & 10.00\\
+1.06 & 4000 & 2962 & 7.275e-35 & 1.249e-34 & 4.435e-28 & 2.691e-31 & 6.548\\
+1.09 & 4000 & 3043 & 1.306e-37 & 2.162e-37 & 1.034e-30 & 4.711e-34 & 3.774\\
+1.12 & 5550 & 4305 & 1.903e-40 & 3.001e-40 & 2.049e-33 & 8.502e-37 & 3.933\\
+1.15 & 5550 & 4418 & 1.752e-43 & 2.799e-43 & 2.501e-36 & 8.572e-40 & 2.857\\
+1.18 & 5550 & 4531 & 9.792e-47 & 1.636e-46 & 2.088e-39 & 6.011e-43 & 2.148\\
+1.19 & 5550 & 4569 & 7.823e-48 & 1.312e-47 & 1.439e-40 & 4.329e-44 & 264.7\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At $L=0.8$ our certified values are consistent with Zhu's [Thm.~6.2]: $8.9\e{-18}\le\lambda_1^\ev\le2.523\e{-16}$, $\lambda_2^\ev\ge2.085\e{-12}$, $8.206\e{-15}\le\lambda_1^\od\le2.347\e{-14}$. Zhu's certified upper bound $\lambda_1^\ev(0.8)\le2.27\e{-17}$ [Table~3] is sharper than our $3.681\e{-17}$.
+
+\subsection{Piece III}\label{sec:results3}
+\emph{Test at $L=1.19$.} With Elston's published parameters at $L=1.19$ ($\delta=0.3$, $\beta_K=64$, $\Tsh=700$, $N=680$, $56$ Gauss points on panels of width $1/4$) the certifier, run by us, gives
+\[
+\lambda_1^\ev(1.19)\ge6.8131164696015\e{-48},\qquad \lambda_1^\od(1.19)\ge3.91966861609542239\e{-44},
+\]
+reproducing Elston's published $6.8131164696007\e{-48}$ (even, $12$ digits) and his odd bound to $17$ digits; the shift $\mu_s$ depends on the thread count through the numerical eigenvalue estimate, and both values are valid lower bounds. With \texttt{--deflate},
+\[
+\lambda_2^\ev(1.19)\ge1.2336395547\e{-40}
+\]
+(non-rigorous Galerkin value $1.23364079\e{-40}$). With $U(1.19)\le1.312\e{-47}$ from Table~\ref{tab:piece2}, $\min(\lambda_2^\ev,\lambda_1^\od)(1.19)/U(1.19)\ge2987$: simple-even at $L=1.19$ is confirmed by a second, independent code path (Elston's reduction instead of Zhu's pointwise cutoff, a different Gram assembly and a different Cholesky certificate).
+
+\begin{table}[ht]
+\centering\footnotesize
+\caption{Piece III windows and certifier parameters, from the field \texttt{args} of each certificate file. Common to all runs: panel width $1/4$, Schur test on $4000$ cells with $1500$ weight iterations. ``GL'' is the number of Gauss--Legendre points per panel, ``bits'' the working precision, ``time'' the wall-clock seconds (field \texttt{seconds}) of the $\lambda_2^\ev$ (deflated) and $\lambda_1^\od$ runs, with $15$--$52$ worker processes. At $1.2785$ the two sectors used different parameters. New prime powers relative to the previous row are listed. Runs not listed are in progress.}\label{tab:grid3}
+\begin{tabular}{lllrrrrrl}
+\toprule
+$L_i$ & $\delta$ & $\beta_K$ & $\Tsh$ & $N$ & GL & bits & time (s), $\lambda_2^\ev$ / $\lambda_1^\od$ & new $n$\\
+\midrule
+1.19 & 0.3 & 64 & 700 & 680 & 56 & 400 & 600--720 each & (test; $n\le 9$)\\
+1.2205 & 0.3 & 64 & 850 & 849 & 56 & 400 & 1009 / 714 & 11\\
+1.25 & 0.3 & 64 & 990 & 1010 & 56 & 400 & 1481 / 1034 & \\
+1.2785, even & 0.3 & 64 & 1150 & 1196 & 57 & 400 & 2418 / --- & \\
+1.2785, odd & 0.3 & 74 & 1130 & 1133 & 63 & 400 & --- / 1000 & \\
+1.3055 & 0.3 & 78 & 1290 & 1315 & 65 & 400 & 3301 / 2466 & 13\\
+1.3315 & 0.2 & 84 & 1570 & 1585 & 70 & 400 & 5673 / 4384 & \\
+1.3565 & 0.2 & 89 & 1730 & 1757 & 74 & 600 & 11116 / 8545 & \\
+1.3805 & 0.2 & 93 & 1890 & 1943 & 78 & 600 & 11639 / 7998 & \\
+1.4035 & 0.2 & 98 & 2070 & 2143 & 81 & 600 & 14363 / 9784 & 16\\
+\midrule
+1.4255 & 0.2 & 102 & 2240 & 2356 & 85 & 600 & running / 13217 & 17\\
+1.447 & 0.2 & 107 & 2440 & 2587 & 89 & 600 & 24322 / 20970 & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering\footnotesize
+\caption{Piece III certificate. $U(L_i)\ge\lambda_1^\ev(L_i)$ is the $K=640$ Galerkin bound; $\ell^\od$ and $\ell_2$ are certified lower bounds for $\lambda_1^\od$ and $\lambda_2^\ev$; the step ratio in row $L_{i+1}$ is $\min(\ell_2,\ell^\od)(L_{i+1})/U(L_i)$. Lower bounds are rounded down and upper bounds up, to four significant digits, and ratios are floored. The lower bounds in row $1.19$ are the test of \S\ref{sec:results3} and enter no step. Below the rule: additional certified data points beyond $\Lmax$, not part of Theorem~\ref{thm:main} (the $\lambda_2^\ev$ run at $1.4255$ is in progress).}\label{tab:piece3}
+\begin{tabular}{llllll}
+\toprule
+$L_i$ & $U(L_i)$ & $\lambda_1^\od\ge$ & $\lambda_2^\ev\ge$ & step ratio $\ge$\\
+\midrule
+1.19 & 8.712e-48 & 3.91966861609542239e-44 & 1.2336395547e-40 & (Piece II: 264.7)\\
+1.2205 & 2.336e-51 & 1.224e-47 & 4.200e-44 & 1.405\\
+1.25 & 4.458e-55 & 2.642e-51 & 1.162e-47 & 1.131\\
+1.2785 & 8.317e-59 & 5.889e-55 & 2.648e-51 & 1.321\\
+1.3055 & 1.209e-62 & 9.466e-59 & 4.806e-55 & 1.138\\
+1.3315 & 1.693e-66 & 1.706e-62 & 9.901e-59 & 1.412\\
+1.3565 & 1.962e-70 & 2.187e-66 & 1.435e-62 & 1.292\\
+1.3805 & 2.251e-74 & 3.032e-70 & 2.247e-66 & 1.546\\
+1.4035 & 2.493e-78 & 3.492e-74 & 2.991e-70 & 1.552\\
+\midrule
+1.4255 & 2.371e-82 & 3.564e-78 & (running) & ---\\
+1.447 & 2.107e-86 & 3.269e-82 & 3.420e-78 & 1.379\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =====================================================================
+\section{Rigorous upper bounds for larger windows}\label{sec:upper}
+
+This section gives \emph{upper bounds only}; it makes no lower-bound, positivity or simplicity statement.
+
+\emph{Galerkin matrix.} Let $e_k(y)=\sqrt{(2k+1)/(2L)}P_k(y/L)$ with $k=2m+p$, $m<K$, $p\in\{0,1\}$ the parity. With $r=x/L\in[0,2]$, the symmetrised autocorrelation of $e_a,e_b$ is an $L$-independent polynomial in $r$: up to the normalisation $\sqrt{(2a+1)(2b+1)}/2$ it equals $C_{ab}(r)=\int_{-1}^{1-r}P_a(t)P_b(t+r)\,dt$ (for $a+b$ even $C_{ab}=C_{ba}$). By~\eqref{eq:P} the Galerkin matrix is $Q_K=\bigl(\int_0^2C_{ab}\,d\nu_L\bigr)_{a,b}$ plus a multiple of the identity, where $\nu_L$ is the measure with smooth density (pole and archimedean weights) minus the point masses $2\Lambda(n)n^{-1/2}$ at $r=\log n/L$. The entries follow from the Legendre moments $\int P_j(r-1)\,d\nu_L$ by the convolution recurrence~\cite{HaleTownsend}
+\[
+C_{a+1,b}=C_{a-1,b}+\frac{2a+1}{2b+1}\bigl(C_{a,b-1}-C_{a,b+1}\bigr),
+\]
+with exact seeds $C_{0b},C_{1b}$ expressed through $\int_u^1P_k$. The recurrence is run only on $b\ge a$, where it is forward stable; the cost is $O(K^2)$ instead of $O(K^4)$ for direct quadrature.
+
+\begin{proposition}[Rigorous moments]\label{prop:upper}
+The smooth moments are computed with $M_q$-point Gauss--Legendre in $r$, and the truncation error of each is bounded by Lemma~\ref{lem:G}: $|P_j|\le\rho^j$ on $E_\rho$, the maxima of the weights $4L\cosh(Lr/2)$, $2Lr\,e^{-Lr/2}/(1-e^{-2Lr})$ and of the diagonal weight are enclosed by covering the ellipse with $2000$ complex balls, and the poles $r=i\pi m/L$, $m\ne0$, are checked to lie outside $E_\rho$. The Legendre values at the nodes are computed by the Chebyshev recurrence on exact midpoints with an a priori rounding bound and a Markov bound for the node radii, followed by the nonnegative Chebyshev-to-Legendre map. Hence every entry of $Q_K$ is enclosed in a ball, and for every exact vector $v$ the upper endpoint of $v^TQ_Kv/v^Tv$ is an upper bound for $\lambda_1^\sigma(L)$ in the sector of~$v$.
+\end{proposition}
+The last statement holds because $v$ defines a polynomial trial function in the form domain (\S\ref{sec:piece2cert}). The vector $v$ comes from inverse iteration on midpoints and carries no rigour; the reported value is outward-rounded.
+
+\begin{table}[ht]
+\centering\footnotesize
+\caption{Rigorous upper bounds for the lowest eigenvalue in each sector. $K$ = number of Legendre modes per sector; ``---'' = no rigorous run. The Piece III windows are in Table~\ref{tab:piece3} ($K=640$, $3000$ bits).}\label{tab:upper}
+\begin{tabular}{llll}
+\toprule
+$L$ & $\lambda_1^\ev(L)\le$ & $\lambda_1^\od(L)\le$ & $K$, bits (even; odd)\\
+\midrule
+1.5 & 3.85105826960019e-97 & 8.21780562022764e-93 & $384$, $2400$; $512$, $4000$\\
+1.75 & --- & 2.06808416452444e-162 & ---; $512$, $4000$\\
+2.0 & 1.84681871820091e-283 & 3.23821041502563e-278 & $1024$, $6000$; $1024$, $6000$\\
+2.25 & 9.03204367909380e-476 & 4.64181809939520e-470 & $2048$, $8000$; $1792$, $8000$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At $L=2$ our even bound is below Zhu's certified $3.19\e{-283}$ [Table~3]; certified upper bounds for $L\le2$ are not new. The window $L=2.25$ lies outside the range of~\cite{Zhu}. Non-rigorous Galerkin values continue to decrease slowly with $K$ (at $L=2.25$: $9.894\e{-476}$, $9.337\e{-476}$, $9.032\e{-476}$ for $K=1536,1792,2048$); we do not have a bound on the omitted-mode tail, so these upper bounds may be far from sharp in relative terms.
+
+\begin{remark}[Quadrature exponent]\label{rem:rho}
+The $L=2$ even run was made before the exponent of Lemma~\ref{lem:G} was corrected from $\rho^{-2n}$ to $\rho^{-2n+2}$ in this code path ($\rho\le3$ there). The quadrature contributions to the moment radii are below $10^{-1999}$ and the reported radius of the Rayleigh quotient is $4.5\e{-1656}$; scaling the quadrature radii by $\rho^2\le9$ cannot reach the slack of the $15$-digit outward rounding (order $10^{-297}$). A re-run with the corrected exponent has not been made. The bounds $U$ of Table~\ref{tab:piece3} were computed on 30 October 2026 with \file{fr_sweep.py} as shipped in \file{code/upper/}: the exported value is the upper end of the Rayleigh-quotient ball raised by a relative $10^{-13}$ before rounding to $15$ digits, while every ball radius is below $10^{-600}$ times the value, so a factor $\rho^2\le9$ on the quadrature part of the radius cannot reach that margin, whichever exponent was in use. The working directory was not under version control, so the revision of \file{fast_recurrence.py} used for each run is not recorded. Re-running $U(1.19)$ with the shipped code on 31 October 2026 reproduced every exported digit and the radius (\file{data/piece3/rerun_U1.19.jsonl}). For the other rows of Table~\ref{tab:upper} (28--30 October; by-products that enter no proof) we have not confirmed which exponent was used.
+\end{remark}
+
+% =====================================================================
+\section{A numerical observation: prime-power singular points}\label{sec:kinks}
+
+\emph{Everything in this section is numerical and non-rigorous.} It concerns finite-dimensional approximants of the even minimiser; whether the limiting eigenfunction has the same features is not established. That near-null eigenvectors have weak singularities at $\log n$ and $L-\log n$, and that meshes should be cut there, is due to Eberwein~\cite[\S13]{Eberwein}, whose spectral-element code already does so; the mechanism is the one familiar from differential-difference equations. Only the measurements below are ours. Note also that second-generation points such as $L-\log6$ exist, so the singular set is not limited to $|L-\log n|$ with $n$ a prime power.
+
+At $L=1.19$ the Legendre coefficients of the lowest Galerkin eigenvector ($K=384$) fall exponentially to about $10^{-25}$ by degree $160$ and then only like (degree)$^{-2.1}$. A periodogram of the high-degree coefficients locates singular points at $|y|\approx0.088$--$0.105$, $0.183$--$0.198$, $0.406$, $0.510$, $0.747$, $0.884$, $1.003$, which match $|L-\log n|=0.091$, $0.196$, $0.419$, $0.497$, $0.756$, $0.889$, $1.007$ for $n=3,4,5,2,7,8,9$; there is no signal at $|L-\log6|=0.602$. A heuristic reason: in the eigen-equation the shifted copies $f(y\pm\log n)$ (with $f=0$ outside $[-L,L]$) switch on or off where $y\pm\log n$ crosses $\mp L$, and only prime powers carry weight ($\Lambda(6)=0$).
+
+To quantify this we use a split-window basis (piecewise Legendre, discontinuous at $\pm(L-\log n)$; its $x$-quadrature error is checked by node doubling but not bounded) and record the one-sided jumps of the computed eigenvector at the breakpoints, normalised by $\Lambda(n)n^{-1/2}f(L)$. Table~\ref{tab:kinks} gives the absolute values at $L=1.19$ for four resolutions. The signs are negative for $n=2,3$ (where $L-\log n>0$) and positive otherwise, as the heuristic predicts.
+
+\begin{table}[ht]
+\centering\footnotesize
+\caption{$|\text{jump}|/(\Lambda(n)n^{-1/2}f(L))$ at $y=L-\log n$ (or $\log n-L$), $L=1.19$, even sector, split-window basis with base allocation $24$; ``CV'' is the coefficient of variation over the seven prime powers.}\label{tab:kinks}
+\begin{tabular}{lrrrrrrrrr}
+\toprule
+$N_{\mathrm{tot}}$ & $n=3$ & 4 & 5 & 2 & 7 & 8 & 9 & mean & CV\\
+\midrule
+600 & 0.119 & 0.134 & 0.112 & 0.117 & 0.112 & 0.141 & 0.120 & 0.122 & 0.085\\
+800 & 0.112 & 0.125 & 0.104 & 0.117 & 0.107 & 0.120 & 0.110 & 0.113 & 0.061\\
+1200 & 0.107 & 0.109 & 0.103 & 0.107 & 0.104 & 0.119 & 0.118 & 0.110 & 0.054\\
+1600 & 0.100 & 0.108 & 0.099 & 0.106 & 0.097 & 0.112 & 0.107 & 0.104 & 0.051\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At $L=1.19$ the normalised jumps of all seven prime powers are thus close to a common value (CV about $5\%$ at the two highest resolutions), although raw weights $\Lambda(n)n^{-1/2}$ range from $0.25$ to $0.74$; the common value drifts down with resolution (roughly like $1/(\ln(1/h)+b)$ in the mesh size $h$), so it is not a constant: the computed jumps are finite-resolution images of a logarithmically softened singularity of a continuous function, and they tend to $0$. At $L=1.5$ the value-jump ratios are again close to each other, but the split-window mesh there omits some cuts (including second-generation points close to the $n=8,16$ cuts), and we make no per-breakpoint claim. Prior work: the location of the singular points and the cut mesh are Eberwein's~\cite[\S13]{Eberwein}; jumps of a trial vector at $L-\log n$ appear in Mori's work~\cite{Mori}, and the $\pm\log n$ shift structure in~\cite[eq.~(2.11)]{Suzuki}.
+
+% =====================================================================
+\section{Reproducibility}\label{sec:repro}
+
+\subsection{Software and hardware}
+Python 3.12 (3.12.13 for Pieces I--II) with python-flint 0.9.0, which bundles FLINT/Arb 3.6.0~\cite{FLINT,Johansson}; the C tools \texttt{vchol} (verified Cholesky) and \texttt{veig} (estimates only) of Piece~II are built with gcc 15.2.0 against FLINT 3.4. Pieces I--II ran on a 20-thread laptop and a cluster of three 64-core nodes (FLINT versions on the cluster not recorded; a SHA-256 check of the code files on every host was in force for the certificate of record). Piece~III and \S\ref{sec:upper} ran on three 64-vCPU virtual machines. Elston's certifier is used at upstream commit \file{3cc4cb7be6a659f1463ae4e2e99ad7ae5e6646f5} with the \texttt{--deflate} option added (\file{code/gap/elston/}).
+
+\emph{Run times.} Piece~II certificate of record: clean rerun for $L\le1$ about $5.8$\,h in three stages; extension $1.03$--$1.09$: $2859$\,s, $11022$\,s, $11760$\,s; continuation $1.12$--$1.19$ about $28.5$\,h in total (head assembly about $6.5$--$7$\,h per window on the cluster). Piece~III test at $L=1.19$: $10$--$12$\,min per run with $18$ workers. Piece~III certificates: per run as in Table~\ref{tab:grid3}; the $16$ runs behind Theorem~\ref{thm:main} took about $814$ worker-process hours (seconds times workers), all $19$ shipped runs about $1177$. Upper bounds $U$ ($K=640$, $3000$ bits): $626$--$822$\,s per window. Rigorous upper bounds of Table~\ref{tab:upper}: $L=2$, $K=1024$: $3166$\,s (even), $10971$\,s (odd); $L=2.25$: $63923$\,s (even), $77675$\,s (odd); $L=1.5$, $1.75$ odd: $1278$\,s, $1293$\,s; $L=1.5$ even ($K=384$): $421$\,s.
+
+\subsection{Commands}
+\begin{itemize}
+\item Piece I and Piece II gluing: \texttt{python code/theorem.py --check} (seconds; ends with ``THEOREM CERTIFIED for all L in (0, 1.19]''). Windows: \texttt{python code/theorem.py} with the environment settings recorded in the release.
+\item Piece III gluing: \texttt{python code/gap/check\_steps.py} (seconds; reads \file{data/piece3/}; ends with ``CERTIFIED: \dots simple-even for all L in (0, 1.4035]'', compare \file{data/piece3/check.log}).
+\item Piece III lower bounds, in \file{code/gap/elston/}, with the window options \texttt{<w>} from the field \texttt{args} of the certificate file (e.g.\ \texttt{--a 1.2205 --delta 0.3 --beta-k 64 --tsharp 850 --nmodes 849 --gl 56 --prec 400}):
+{\footnotesize
+\begin{verbatim}
+C="--panels-per-unit 4 --schur-k 4000 --schur-iters 1500"
+python grid_certificate_rigorous.py <w> $C --sector odd --workers n --json <out>
+python grid_certificate_rigorous.py <w> $C --sector even --deflate --workers n \
+       --json <out>
+\end{verbatim}}
+\item Upper bounds, in \file{code/upper/} (exports the outward-rounded field \texttt{lam0\_upper}):
+{\footnotesize
+\begin{verbatim}
+THREADS=n python fr_sweep.py <out.jsonl> "640" "1.19,1.2205,..." 3000
+\end{verbatim}}
+\end{itemize}
+
+\begin{table}[ht]
+\centering\footnotesize
+\caption{Provenance of the numbers in this paper. Paths under \texttt{highprec/} are in the author's working tree and are not part of the repository; all files the theorem depends on are.}\label{tab:files}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.36\textwidth}>{\raggedright\arraybackslash}p{0.56\textwidth}}
+\toprule
+Item & File(s)\\
+\midrule
+Table~\ref{tab:piece2}, Piece I constants & \file{data/theorem_bounds.json}; \file{code/theorem.py}; logs \file{data/logs/check.log}, \file{run_rerun.log}, \file{run_extend.log} (release of~\cite{Botha})\\
+Remark~\ref{rem:erratum} & \file{data/history/theorem_bounds_corrected.json}, \file{data/logs/run_gl_correction.log}\\
+Piece III parameters (Table~\ref{tab:grid3}) & field \texttt{args} of each file in \file{data/piece3/}; design rule \file{code/gap/params.py}\\
+Piece III certifier & \file{code/gap/elston/grid_certificate_rigorous.py}, \file{UPSTREAM_COMMIT}, \file{LICENSE}\\
+$L=1.19$ test (\S\ref{sec:results3}) & run logs on the compute host, not shipped (the test enters no step of the proof)\\
+Table~\ref{tab:piece3} lower bounds & \file{data/piece3/g_<L>_l2.json} ($\lambda_2^\ev$), \file{g_<L>_odd.json} ($\lambda_1^\od$); field \texttt{certified\_lower\_bound}\\
+Table~\ref{tab:piece3} upper bounds & \file{data/piece3/upper640.jsonl}, field \texttt{lam0\_upper}; code \file{code/upper/}\\
+Piece III gluing & \file{code/gap/check_steps.py}, log \file{data/piece3/check.log}, checksums \file{data/piece3/SHA256SUMS}\\
+Table~\ref{tab:upper}, $L=2$ even & \file{highprec/data/rig_L2.jsonl}, \file{rig_L2.log}\\
+Table~\ref{tab:upper}, other rows & \file{highprec/data/rig_L225.jsonl} ($L=2.25$ even), \file{highprec/data/odd.jsonl} (odd sector), \file{highprec/gap/out_all/upper.jsonl} ($L=1.5$ even)\\
+Non-rigorous Galerkin values (\S\ref{sec:upper}) & \file{highprec/data/fr_L225*.jsonl}, \file{fr_sweep*.jsonl}\\
+\S\ref{sec:kinks} & \file{highprec/data/tail_probe.json}, \file{kink_119_*.json}, \file{kink_15_*.json}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Verification and audits}
+All reviews so far were carried out by AI agents directed by the author; no independent human referee has checked the proofs or the code.
+\begin{itemize}
+\item \emph{Pieces I--II.} Three independent review rounds of the earlier note produced, among others: the Gauss--Legendre exponent correction (Remark~\ref{rem:erratum}); reconciliation of the Piece I constants across precisions; outward rounding of all quoted bounds; a downward-induction proof of the Bessel ratio enclosure; the definition of the continuation of $\re\psi$ off the real axis; documentation of Python \texttt{min} on balls; a mollification argument for~\eqref{eq:P}; a self-contained discreteness proof; a SHA-256 check of remote code; and corrected credit to Zhu for the reduction. Every finding was checked against code, logs and data before it was applied. A clean end-to-end rerun with a single code revision (empty cache, tools rebuilt, remote code hashed) then reproduced all lower bounds for $L\le1$ to about three significant digits. The sharp-cutoff path and the windows $1.03$--$1.19$ have not been through a review round.
+\item \emph{Upper-bound code.} An external review of the high-precision notes (six findings, all accepted) led to per-code-path rigour labels, outward rounding of exported upper endpoints, and withdrawal of an unsupported tail claim; an earlier review found and fixed an inaccurate ball inverse, a missing residual check and a missing quadrature bound.
+\item \emph{Piece III.} Elston's certifier was audited independently at $L=1.19$ (two issues fixed; documented in~\cite{Elston}); the post-audit code at larger $L$ and our \texttt{--deflate} addition have not been audited. The step test (\file{code/gap/check_steps.py}, about $50$ lines) compares explicit Arb endpoints. The reproduction of Elston's $L=1.19$ bounds to $12$ and $17$ digits is a consistency check of the installation, not an audit.
+\end{itemize}
+\emph{Invitation to review.} This work has not been peer-reviewed. Code, certificate files and this source are public at \url{https://github.com/GenusCore/weil-ground-state-simple-even}; the file \file{REVIEWING.md} there lists the least-checked parts and concrete checks ordered by effort, from re-running the gluing script on the shipped certificates (minutes) to re-running a single window (hours). Independent review by anyone is welcome; confirmed errors will be corrected publicly and reviewers credited.
+
+% =====================================================================
+\section{Limitations}\label{sec:limitations}
+\begin{enumerate}
+\item \emph{Range.} The theorem is certified on $(0,\Lmax]$. The extension to $1.5$ is in progress (Remark~\ref{rem:status}); the passing step $[1.4255,1.447]$ is a data point only.
+\item \emph{Piece III is unaudited beyond $L=1.19$.} Elston's certifier was audited only at $L=1.19$; the runs at larger $L$, the parameter changes ($\beta_K$, $\Tsh$, $N$, Gauss points) and our \texttt{--deflate} addition have not been reviewed. The step ratios of Piece~III are small ($1.131$--$1.552$), so the theorem on $(1.19,\Lmax]$ depends on every bound being correct to within about $13\%$.
+\item \emph{Computer assistance.} Correctness depends on Arb/FLINT, on our code for Pieces I--II and \S\ref{sec:upper}, on Elston's code for Piece~III, and on the lemmas above.
+\item \emph{Normalisation.} Our $Q_L$ follows Zhu and was validated against the zero side of the explicit formula. It has not been checked line by line against $QW_\lambda$ of~\cite{CvS,CCM25}. Remark~\ref{rem:affine} covers positive affine changes, not a discrepancy in the relative weights of the pole, archimedean and prime terms.
+\item \emph{Self-adjoint realisation.} We use the closure of $Q_L$ on $C_c^\infty(-L,L)$; trial polynomials not vanishing at $\pm L$ are in its form domain by the argument in \S\ref{sec:piece2cert}. A different realisation would need re-examination.
+\item \emph{Unexplained precision dependence} of the upper end of $\int|h|$ in Piece~I (largest value used).
+\item \emph{Comparisons on balls.} Python \texttt{min}/\texttt{max} on Arb balls occur in the gluing and in some intermediate steps of both certifiers; every current use is separated by many orders of magnitude more than the radii.
+\item \emph{Sharp-cutoff and triangular assembly code} for $1.03\le L\le1.19$ in Piece~II has not been reviewed; $L=1.19$ is, however, re-confirmed by the Piece~III code path.
+\item \emph{Upper bounds of \S\ref{sec:upper}} are upper bounds only; their distance from the true eigenvalue is not controlled (Remark~\ref{rem:rho} for the $L=2$ quadrature exponent).
+\item \emph{Section~\ref{sec:kinks}} is numerical; the split-window $x$-quadrature is not bounded.
+\item \emph{Scope.} Nothing is claimed for $L>\Lmax$, about the convergence step~(ii) of~\cite{CCM25}, or about RH.
+\end{enumerate}
+
+\section*{Acknowledgements}
+The Piece~III lower bounds use Zac Elston's certifier \emph{weil-windows}~\cite{Elston} (MIT licence), which we ran with one added option; the reduction it implements and the published $L=1.19$ certificates are his. The window certificates of Pieces I--II rest on Xuefeng Zhu's frequency-cutoff reduction and block estimate~\cite{Zhu}. The survey of lower-bound methods behind Piece~III drew on the work of Mori~\cite{Mori} and of Liu~\cite{Liu}, whose position-side use of the Legendre convolution recurrence preceded ours.
+
+\section*{AI-assistance statement}
+Computations, code and drafting were carried out with substantial assistance from an AI system (Anthropic's Claude). All results were checked by independent recomputation, and the author takes responsibility for the content.
+
+\bibliographystyle{amsplain}
+\bibliography{refs}
+
+\end{document}

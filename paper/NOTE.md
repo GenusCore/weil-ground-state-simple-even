@@ -1,3 +1,5 @@
+> **Release 1.1.0 (2026-10-31):** the current paper is [`main.pdf`](main.pdf) (source `main.tex`), which extends the theorem to $L \in (0, 1.4035]$. This note is the write-up of the $(0, 1.19]$ release of 2026-10-26 and is otherwise unchanged; its content on $(0, 1.19]$ is reproduced in `main.tex`.
+
 # A certified simple, even ground state of the localized Weil quadratic form for all windows $L \in (0, 1.19]$
 
 **Johann Alexander Botha** (GenusCore; contact: info@genuscore.com)

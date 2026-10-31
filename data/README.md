@@ -14,6 +14,11 @@ All bounds are Arb balls written as strings `"[midpoint +/- radius]"`. Each wind
 | `logs/run_extend.log` | Validation at `L = 1.0`, window `1.03`, the out-of-memory abort at `1.06`, the resume, windows `1.06` and `1.09`, the restart with the upper-triangle code and window `1.12`, then windows `1.15`, `1.18`, `1.19` (cluster assembly by `code/prefetch.py` pipelined with local certification) | Complete run log; the earlier release's log is a prefix of it. |
 | `logs/run_gl_correction.log` | Output of `gl_correction.py` (history) | |
 | `logs/check.log` | Output of `python code/theorem.py --check` on `theorem_bounds.json` | Ends with `THEOREM CERTIFIED for all L in (0, 1.19]`. |
+| `piece3/g_<L>_l2.json`, `piece3/g_<L>_odd.json` | **Piece III certificates** (release 1.1.0): lower bounds for the second even eigenvalue (`l2`, run with `--deflate`) and the lowest odd eigenvalue, field `certified_lower_bound` (an Arb ball; the lower end is used). 16 files for `L = 1.2205 ... 1.4035`, plus `1.4255` odd and `1.447` both sectors (data points beyond the theorem) | Elston's certifier `code/gap/elston/grid_certificate_rigorous.py`, run 2026-10-30/31 on three 64-vCPU VMs; options in the field `args`, wall-clock time in `seconds`. The field `args.json` is the path on the compute host. |
+| `piece3/upper640.jsonl` | Upper bounds `U(L)` for the lowest even eigenvalue, `K = 640`, 3000 bits, field `lam0_upper` (outward rounded), at the 13 grid points `1.19 ... 1.4885` | `code/upper/fr_sweep.py`, run 2026-10-30. |
+| `piece3/rerun_U1.19.jsonl` | Re-run of `U(1.19)` with the shipped `code/upper/` on 2026-10-31 | Reproduces the stored line exactly. The revision of `fast_recurrence.py` used on 2026-10-30 was not recorded; the file was edited afterwards (per the project log, a fix of the `primes=False` path, which the upper bounds do not use). |
+| `piece3/check.log` | Output of `python code/gap/check_steps.py` on `data/piece3/` | Ends with `CERTIFIED: ... simple-even for all L in (0, 1.4035]`. |
+| `piece3/SHA256SUMS` | SHA-256 of every file in `piece3/` | `cd data/piece3 && sha256sum -c SHA256SUMS`. |
 
 Notes.
 
