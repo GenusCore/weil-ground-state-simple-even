@@ -1,5 +1,7 @@
 # Simple, even ground state of the localized Weil form for L in (0, 1.4035]
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23832220.svg)](https://doi.org/10.5281/zenodo.23832220)
+
 This is a computer-assisted proof, using Arb/FLINT ball arithmetic, of the following statement. For every window
 half-width `L` in `(0, 1.4035]`, the lowest eigenvalue of Weil's quadratic form for the Riemann zeta function on
 `L^2(-L, L)` is simple, and its eigenfunction is even.
@@ -364,11 +366,12 @@ Corrections and error reports are very welcome.
 
 ## How to cite
 
-See `CITATION.cff`:
+Archived on Zenodo. DOI for all versions (resolves to the newest): [10.5281/zenodo.23832220](https://doi.org/10.5281/zenodo.23832220);
+this version, v1.1.1: [10.5281/zenodo.23832221](https://doi.org/10.5281/zenodo.23832221). See also `CITATION.cff`:
 
 > Johann Alexander Botha, *A certified simple, even ground state of the localized Weil quadratic form for all windows
-> L in (0, 1.4035]*, computer-assisted paper and code, version 1.1.0 (2026-10-31), unrefereed, produced with AI
-> assistance.
+> L in (0, 1.4035]*, computer-assisted paper and code, version 1.1.1 (2026-10-31), Zenodo,
+> doi:10.5281/zenodo.23832221. Unrefereed, produced with AI assistance.
 
 Please also cite Zhu (arXiv:2608.24827), whose reduction the proof uses, Elston (`weil-windows`), whose certifier
 Piece III uses, and the prior work listed above where
