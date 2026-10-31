@@ -74,11 +74,18 @@ The certified numbers are in `data/theorem_bounds.json` (Pieces I–II, Table 2 
 
 The convention throughout is that `L` is the half-width and `p^k` enters when `log p^k < 2L`.
 
-- **Believed new: `(0.8, 1.4035]`.** Our search, last refreshed 2026-10-25, found no public proof or certificate of
-  simple-even for any continuum window `L > 0.8`. The only exception is the non-explicit neighbourhood of `0.8` in
+- **Believed new: `(0.8, 1.4035]`.** Our search (arXiv, Zenodo, GitHub and rStation; refreshed 2026-10-31) found no
+  public proof or certificate of simple-even for any continuum window `L > 0.8`. The only exception is the non-explicit neighbourhood of `0.8` in
   mathia PL-287. Andrade (Zenodo 20887028) and Andrews Jr. (Zenodo 22715669) certify simple-even for *finite* Galerkin matrices at
   `L ≈ 1.28, 1.68, 1.99`; those are not statements about the continuum form. Much of this literature is unrefereed
-  Zenodo/GitHub work and appears quickly, so the search may have missed items.
+  Zenodo/GitHub work and appears quickly, so the search may have missed items. On rStation, lihongmin
+  (riemann_hypothesis paper 45 v1, published 2026-10-23) and bramble_trace (paper 60 v1, published 2026-10-26)
+  certify positivity of both parity sectors on `(0, (1/2) log 11]` and `(0, 2]` respectively; both use our form, and
+  their support radius `a` is our `L`. Neither identifies the ground state or compares the sectors (paper 45 §1: "our
+  lower certificate neither identifies the ground state nor estimates the sharp minimum"). What we claim as new on
+  `(0.8, 1.4035]` is therefore simple-even itself (the ground state is simple and even) and the certified lower
+  bounds on the second even eigenvalue `lambda_2^even` that prove it (rank-one deflation in Piece III), not
+  positivity.
 - **Not new: `(0, 0.8]`.** Kramarenko-Byrd (Zenodo 23007100, v1 of 2026-09-27, unrefereed) claims a rigorous proof of
   simple-even for all `0 < L <= 4/5`, in the same convention. We have not checked that proof. Our certificate on
   `(0, 0.8]` is an independent computer-assisted confirmation of that range (independent of Kramarenko-Byrd; not
@@ -97,8 +104,10 @@ The convention throughout is that `L` is the half-width and `p^k` enters when `l
   on it.
 - **Not new: positivity.** Positivity, i.e. `lambda_0 > 0`, is certified or claimed elsewhere on this whole range,
   including past `L = 1`. Sources include jose-paul-b, Zhu, Liu (`L = 1`, `17/16`), Mori (up to `(log 15)/2`), Senke
-  (`77/64`) and Elston (per-sector bounds at `1.19`–`1.495`). Apart from Zhu's single window `L = 0.8`, none of these
-  positivity results addresses simplicity or parity.
+  (`77/64`), Elston (per-sector bounds at `1.19`–`1.495`), lihongmin (rStation riemann_hypothesis paper 45 v1, both
+  sectors, `(0, (1/2) log 11]`) and bramble_trace (rStation paper 60 v1, both sectors, `(0, 2]`, full-source Schur
+  certificate). Apart from Zhu's single window `L = 0.8`, none of these positivity results addresses simplicity or
+  parity.
 
 Our own contributions are:
 
@@ -130,7 +139,9 @@ These are taken from paper §10.
 5. **Past `L = 1`.** The step ratios there are smaller (10.00, 6.548, 3.774, 3.933, 2.857, 2.148, 264.7), and the
    sharp-cutoff path is used only there. Zhu retracted an earlier positivity claim at `L = 1.19`, which is the last
    window of Piece II: our bracket there (`lambda_0 >= 7.823e-48`) implies positivity at that `L`, rests on the unreviewed
-   sharp-cutoff and triangular code, and is the window most in need of independent checking. One error constant (Gauss–Legendre, off by one node)
+   sharp-cutoff and triangular code, and is the window most in need of independent checking. Positivity at `L = 1.19`
+   is independently certified by rStation papers 45 and 60; what rests on our unreviewed code there is the
+   simple-even bracket, not positivity. One error constant (Gauss–Legendre, off by one node)
    has already been found and corrected in this project; see Remark 5.9 of the paper. The tail bounds, the drop
    bound, the transport precision, the Bessel seeds and `psi_floor` deserve an independent audit. The sharp-cutoff
    path and the windows 1.03–1.19, which carry the novelty claim, have not been through any review round, internal or
@@ -322,6 +333,13 @@ the cited prior work, especially Zhu and Kramarenko-Byrd.
   - Elder (Zenodo 23113186).
   - Eberwein (Zenodo 23177438).
   - "Eureka" (arXiv:2608.19047).
+  - lihongmin, "Cutoff-free positivity of localized Weil forms through the (log 11)/2 threshold", rStation
+    riemann_hypothesis paper 45, v1, published 2026-10-23T09:48:37Z,
+    https://rstation.ai/problems/riemann_hypothesis/papers/45/v1. Positivity of both parity sectors on
+    `(0, (1/2) log 11]`.
+  - bramble_trace, "Full-source Schur certificates for Weil positivity at support radius two", rStation
+    riemann_hypothesis paper 60, v1, published 2026-10-26T19:12:17Z,
+    https://rstation.ai/problems/riemann_hypothesis/papers/60/v1. Positivity of both parity sectors on `(0, 2]`.
 
   See paper §1.3 for what each one did.
 - **Software.**
