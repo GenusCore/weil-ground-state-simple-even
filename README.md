@@ -84,8 +84,8 @@ The convention throughout is that `L` is the half-width and `p^k` enters when `l
   their support radius `a` is our `L`. Neither identifies the ground state or compares the sectors (paper 45 §1: "our
   lower certificate neither identifies the ground state nor estimates the sharp minimum"). What we claim as new on
   `(0.8, 1.4035]` is therefore simple-even itself (the ground state is simple and even) and the certified lower
-  bounds on the second even eigenvalue `lambda_2^even` that prove it (rank-one deflation in Piece III), not
-  positivity.
+  bounds on the second even eigenvalue `lambda_2^even` that prove it (Piece II, and the rank-one deflation of
+  Piece III), not positivity.
 - **Not new: `(0, 0.8]`.** Kramarenko-Byrd (Zenodo 23007100, v1 of 2026-09-27, unrefereed) claims a rigorous proof of
   simple-even for all `0 < L <= 4/5`, in the same convention. We have not checked that proof. Our certificate on
   `(0, 0.8]` is an independent computer-assisted confirmation of that range (independent of Kramarenko-Byrd; not
